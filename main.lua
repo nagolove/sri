@@ -46,7 +46,8 @@ function intersection(start1, end1, start2, end2)
     local seg2_line1_start = a1 * start2.x + b1 * start2.y + d1;
     local seg2_line1_end = a1 * end2.x + b1 * end2.y + d1;
 
-    --если концы одного отрезка имеют один знак, значит он в одной полуплоскости и пересечения нет.
+    --если концы одного отрезка имеют один знак, значит он в одной 
+    --полуплоскости и пересечения нет.
     if (seg1_line2_start * seg1_line2_end >= 0 or 
         seg2_line1_start * seg2_line1_end >= 0) then
         return nil
@@ -61,10 +62,29 @@ end
 -- center - вектор центра окружности
 -- rad - радиус окружности
 -- возвращает два или одно значение точек пересечения в виде векторов или nil
+-- источник: http://csharphelper.com/blog/2014/09/determine-where-a-line-intersects-a-circle-in-c/
 function intersectionWithCircle(p1, p2, center, rad)
-    local dist = nearestDist(center, p1, p2)
-    if dist > rad then
+    local t
+    local dx = p2.x - p1.x;
+    local dy = p2.y - p1.y;
+    local a = dx * dx + dy * dy;
+    local b = 2 * (dx * (p1.x - center.x) + dy * (p1.y - center.y));
+    local c = (p1.x - center.x) * (p1.x - center.x) + 
+        (p1.y - center.y) * (p1.y - center.y) - rad * rad;
+
+    local det = b * b - 4 * a * c
+    --if ((a <= 0.0000001) || (det < 0))
+    if a <= 0.0001 or det < 0 then
         return nil
+    elseif det == 0 then -- проверь, может быть равен нулю? Или сделать сравнение?
+        t = -b / (2 * a)
+        return vector(p1.x + t * dx, p1.y + t * dy)
+    else
+        t = (-b + math.sqrt(det)) / (2 * a)
+        local res1 = vector(p1.x + t * dx, p1.y + t * dy)
+        t = (-b - math.sqrt(det)) / (2 * a)
+        local res2 = vector(p1.x + t * dx, p1.y + t * dy)
+        return res1, res2
     end
 end
 
@@ -85,6 +105,8 @@ local h = lg.getHeight()
 -- убрать эти переменные, слишком употребительные имена, вносящие путаницу
 local cx, cy = 40, 40
 local baseLineParam = 30
+local circleRad = 255
+local p1, p2, p3, p4
 
 -- расчет координат базовых линий построения. d - параметр отвечающий за
 -- расстояние между горизонталью и центром рисунка.
@@ -99,6 +121,13 @@ function love.load()
     -- bhupur.center.y
     bhupur.draw(cx, cy, h - cx * 2)
     setupBaseLines(baseLineParam)
+
+    p1, p2 = intersectionWithCircle(line1[1], line1[2],
+        vector(bhupur.center.x, bhupur.center.y), circleRad)
+    p3, p4 = intersectionWithCircle(line2[1], line2[2],
+        vector(bhupur.center.x, bhupur.center.y), circleRad)
+    print("p1", inspect(p1))
+    print("p2", inspect(p2))
 end
 
 function love.draw()
@@ -109,7 +138,12 @@ function love.draw()
 
     lg.setColor{1, 1, 1}
     -- нужно вычислить подходящий радиус окружности автоматически
-    lg.circle("line", bhupur.center.x, bhupur.center.y, 255)
+    lg.circle("line", bhupur.center.x, bhupur.center.y, circleRad)
+
+    lg.circle("fill", p1.x, p1.y, 3)
+    lg.circle("fill", p2.x, p2.y, 3)
+    lg.circle("fill", p3.x, p3.y, 3)
+    lg.circle("fill", p4.x, p4.y, 3)
 
     drawVecLine(line1)
     drawVecLine(line2)
