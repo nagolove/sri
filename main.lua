@@ -1,6 +1,10 @@
+-- [[
+-- Общие параметры - диаметр окружности, ширина квадрата защиты, базовое
+-- расстояние.
+-- ]]
 local inspect = require "inspect"
 local vector = require "vector"
-local linebuf = require "kons".new()
+local linesbuf = require "kons".new()
 local bhupur = require "bhupur"
 local lg = love.graphics
 
@@ -78,14 +82,23 @@ function drawVecLine(p1, p2)
 end
 
 local h = lg.getHeight()
+-- убрать эти переменные, слишком употребительные имена, вносящие путаницу
 local cx, cy = 40, 40
+local baseLineParam = 30
+
+-- расчет координат базовых линий построения. d - параметр отвечающий за
+-- расстояние между горизонталью и центром рисунка.
+function setupBaseLines(d)
+    local cx, cy = bhupur.center.x, bhupur.center.y
+    line1 = {vector(40, cy - d), vector(560, cy - d)}
+    line2 = {vector(40, cy + d), vector(560, cy + d)}
+end
 
 function love.load()
     -- вызов только для прерасчета координат центра рисунка в bhupur.center.x,
     -- bhupur.center.y
     bhupur.draw(cx, cy, h - cx * 2)
-    
-    line1 = {vector(), vector()}
+    setupBaseLines(baseLineParam)
 end
 
 function love.draw()
@@ -95,17 +108,28 @@ function love.draw()
     lg.circle("fill", bhupur.center.x, bhupur.center.y, 3)
 
     lg.setColor{1, 1, 1}
+    -- нужно вычислить подходящий радиус окружности автоматически
     lg.circle("line", bhupur.center.x, bhupur.center.y, 255)
 
-    --drawVecLine(line1)
-    --drawVecLine(line2)
+    drawVecLine(line1)
+    drawVecLine(line2)
+
+    linesbuf:pushi("baseLineParam = %d", baseLineParam)
+    linesbuf:draw()
 end
 
 function love.update(dt)
+    linesbuf:update(dt)
 end
 
 function love.keypressed(_, key)
     if key == "escape" then
         love.event.quit()
+    elseif key == "up" then
+        baseLineParam = baseLineParam + 1
+        setupBaseLines(baseLineParam)
+    elseif key == "down" then
+        baseLineParam = baseLineParam - 1
+        setupBaseLines(baseLineParam)
     end
 end
