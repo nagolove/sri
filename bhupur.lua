@@ -13,6 +13,11 @@ local function pack(...)
     return {...}
 end
 
+-- расчет ширины картинки по ширине квадрата
+function bhupur.getWidth(w)
+    return (w - bhupur.neck * w) / 2
+end
+
 function bhupur.draw(x, y, w)
     -- width - size in pixels of square in center on bhupur
     -- neck - percentage value(0-1) of yantrawidth
