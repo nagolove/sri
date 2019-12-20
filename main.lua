@@ -191,6 +191,8 @@ function calculate()
     line14 = copy{p13, p14} 
 
     p15 = intersection(line14[1], line14[2], vertLine[1], vertLine[2])
+    
+    --p16 = intersection(
 end
 
 function love.draw()
@@ -209,20 +211,34 @@ function love.draw()
     lg.circle("fill", p4.x, p4.y, 3)
 
     drawVecLine(vertLine)
-    drawVecLine(line1)
-    drawVecLine(line2)
-    drawVecLine(line3)
-    drawVecLine(line4)
-    drawVecLine(line5)
-    drawVecLine(line6)
-    drawVecLine(line7)
-    drawVecLine(line8)
-    drawVecLine(line9)
-    drawVecLine(line10)
-    drawVecLine(line11)
-    drawVecLine(line12)
-    drawVecLine(line13)
-    drawVecLine(line14)
+    -- горизонталь большого треугольника вершиной вниз
+    drawVecLine(line1) 
+    -- горизонталь большого треугольника вершиной вверх
+    drawVecLine(line2) 
+    -- правая сторона большого треугольника вершиной вниз
+    drawVecLine(line3) 
+    -- левая сторона большого треугольника вершиной вниз
+    drawVecLine(line4) 
+    -- правая сторона большого треугольника вершиной вверх
+    drawVecLine(line5) 
+    -- левая сторона большого треугольника вершиной вверх
+    drawVecLine(line6) 
+    -- первая вспомогательная линия до пересечения окружности справа снизу
+    drawVecLine(line7) 
+    -- первая вспомогательная линия до пересечения окружности слева снизу
+    drawVecLine(line8) 
+    -- горизонталь второгоо треугольника вершиной вверх
+    drawVecLine(line9) 
+    -- правая сторона второго треугольника вершиной вверх
+    drawVecLine(line10) 
+    -- левая сторона второго треугольника вершиной вверх
+    drawVecLine(line11) 
+    -- вспомогательная линия до пересечения с окружностью слева сверху
+    drawVecLine(line12) 
+    -- вторая вспомогательная линия до пересечения с окружностью справа сверху
+    drawVecLine(line13) 
+    -- горизонталь второго треугольника вершиной вниз
+    drawVecLine(line14) 
 
     if p5 then
         lg.circle("fill", p5.x, p5.y, 3)
