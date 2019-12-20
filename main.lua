@@ -174,6 +174,20 @@ function calculate()
 
     line10 = copy{p8, p10}
     line11 = copy{p9, p10}
+
+    p11 = intersection(line10[1], line10[2], line3[1], line3[2]) -- правая
+    p12 = intersection(line11[1], line11[2], line4[1], line4[2]) -- левая
+
+    dir = (circleCenter - p11):normalizeInplace() * 440
+    line12 = copy{p11, p11 + dir} -- правая
+
+    dir = (circleCenter - p12):normalizeInplace() * 440
+    line13 = copy{p12, p12 + dir} -- левая
+
+    p13 = intersectionWithCircle(line12[1], line12[2], circleCenter, circleRad)
+    p14 = intersectionWithCircle(line13[1], line13[2], circleCenter, circleRad)
+
+    line14 = copy{p13, p14}
 end
 
 function love.draw()
@@ -203,6 +217,9 @@ function love.draw()
     drawVecLine(line9)
     drawVecLine(line10)
     drawVecLine(line11)
+    drawVecLine(line12)
+    drawVecLine(line13)
+    drawVecLine(line14)
 
     if p5 then
         lg.circle("fill", p5.x, p5.y, 3)
@@ -222,6 +239,19 @@ function love.draw()
     if p10 then
         lg.setColor{0.8, 0, 0.2}
         lg.circle("fill", p10.x, p10.y, 3)
+    end
+    lg.setColor{1, 0, 1}
+    if p11 then
+        lg.circle("fill", p11.x, p11.y, 3)
+    end
+    if p12 then
+        lg.circle("fill", p12.x, p12.y, 3)
+    end
+    if p13 then
+        lg.circle("fill", p13.x, p14.y, 3)
+    end
+    if p14 then
+        lg.circle("fill", p14.x, p14.y, 3)
     end
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
