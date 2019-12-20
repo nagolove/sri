@@ -192,7 +192,14 @@ function calculate()
 
     p15 = intersection(line14[1], line14[2], vertLine[1], vertLine[2])
     
-    --p16 = intersection(
+    p16 = intersection(line4[1], line4[2], line2[1], line2[2])
+    p17 = intersection(line3[1], line3[2], line2[1], line2[2])
+
+    dir = (p16 - p15):normalizeInplace() * 130
+    line15 = copy{p15, p16 + dir}
+
+    dir = (p17 - p15):normalizeInplace() * 130
+    line16 = copy{p15, p17 + dir}
 end
 
 function love.draw()
@@ -240,6 +247,10 @@ function love.draw()
     -- горизонталь второго треугольника вершиной вниз
     drawVecLine(line14) 
 
+    drawVecLine(line15) 
+    drawVecLine(line16) 
+    drawVecLine(line17) 
+
     if p5 then
         lg.circle("fill", p5.x, p5.y, 3)
     end
@@ -274,6 +285,12 @@ function love.draw()
     end
     if p15 then
         lg.circle("fill", p15.x, p15.y, 3)
+    end
+    if p16 then
+        lg.circle("fill", p16.x, p16.y, 3)
+    end
+    if p17 then
+        lg.circle("fill", p17.x, p17.y, 3)
     end
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
