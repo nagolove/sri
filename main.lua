@@ -88,9 +88,6 @@ function intersectionWithCircle(p1, p2, center, rad)
     end
 end
 
--- эти линии должны соотноситься с центром рисунка
-local line1, line2
-
 -- на вход принимает либо пару векторов(два параметра функции) либо таблицу
 -- с парой векторов по индексам 1 и 2 соответственно(один параметр функции)
 function drawVecLine(p1, p2)
@@ -101,6 +98,8 @@ function drawVecLine(p1, p2)
     end
 end
 
+-- эти линии должны соотноситься с центром рисунка
+local line1, line2, line3, line4, line5, line6
 local h = lg.getHeight()
 -- убрать эти переменные, слишком употребительные имена, вносящие путаницу
 local cx, cy = 40, 40
@@ -126,6 +125,10 @@ function love.load()
         vector(bhupur.center.x, bhupur.center.y), circleRad)
     p3, p4 = intersectionWithCircle(line2[1], line2[2],
         vector(bhupur.center.x, bhupur.center.y), circleRad)
+    line3 = {p1, vector(bhupur.center.x, bhupur.center.y + circleRad)}
+    line4 = {p2, vector(bhupur.center.x, bhupur.center.y + circleRad)}
+    line5 = {p3, vector(bhupur.center.x, bhupur.center.y - circleRad)}
+    line6 = {p4, vector(bhupur.center.x, bhupur.center.y - circleRad)}
     print("p1", inspect(p1))
     print("p2", inspect(p2))
 end
@@ -147,6 +150,10 @@ function love.draw()
 
     drawVecLine(line1)
     drawVecLine(line2)
+    drawVecLine(line3)
+    drawVecLine(line4)
+    drawVecLine(line5)
+    drawVecLine(line6)
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
     linesbuf:draw()
