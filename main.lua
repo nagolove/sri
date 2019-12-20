@@ -115,7 +115,7 @@ local line1, line2, line3, line4, line5, line6
 local h = lg.getHeight()
 -- убрать эти переменные, слишком употребительные имена, вносящие путаницу
 local cx, cy = 40, 40
-local baseLineParam = 30
+local baseLineParam = 60
 local circleRad = 255
 local p1, p2, p3, p4
 local vertLine
@@ -171,6 +171,9 @@ function calculate()
     p10 = intersection(line1[1], line1[2], vertLine[1], vertLine[2])
 
     line9 = {p8, p9}
+
+    line10 = copy{p8, p10}
+    line11 = copy{p9, p10}
 end
 
 function love.draw()
@@ -198,6 +201,8 @@ function love.draw()
     drawVecLine(line7)
     drawVecLine(line8)
     drawVecLine(line9)
+    drawVecLine(line10)
+    drawVecLine(line11)
 
     if p5 then
         lg.circle("fill", p5.x, p5.y, 3)
