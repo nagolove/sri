@@ -186,8 +186,11 @@ function calculate()
 
     p13 = intersectionWithCircle(line12[1], line12[2], circleCenter, circleRad)
     p14 = intersectionWithCircle(line13[1], line13[2], circleCenter, circleRad)
+    
+    -- горизонталь верхнего треугольника направленного вниз
+    line14 = copy{p13, p14} 
 
-    line14 = copy{p13, p14}
+    p15 = intersection(line14[1], line14[2], vertLine[1], vertLine[2])
 end
 
 function love.draw()
@@ -205,13 +208,13 @@ function love.draw()
     lg.circle("fill", p3.x, p3.y, 3)
     lg.circle("fill", p4.x, p4.y, 3)
 
+    drawVecLine(vertLine)
     drawVecLine(line1)
     drawVecLine(line2)
     drawVecLine(line3)
     drawVecLine(line4)
     drawVecLine(line5)
     drawVecLine(line6)
-    drawVecLine(vertLine)
     drawVecLine(line7)
     drawVecLine(line8)
     drawVecLine(line9)
@@ -252,6 +255,9 @@ function love.draw()
     end
     if p14 then
         lg.circle("fill", p14.x, p14.y, 3)
+    end
+    if p15 then
+        lg.circle("fill", p15.x, p15.y, 3)
     end
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
