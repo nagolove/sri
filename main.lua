@@ -21,6 +21,18 @@ local function nearestDist(c, p1, p2)
   return tmp:cross(c - p1) / tmp:len()
 end
 
+function copy(tbl)
+    local result = {}
+    for k, v in pairs(tbl) do
+        result[k] = v
+        local mt = getmetatable(v)
+        if mt then 
+            setmetatable(result[k], mt) 
+        end
+    end
+    return result
+end
+
 -- параметры - hump.vector
 -- источник: https://users.livejournal.com/-winnie/152327.html
 function intersection(start1, end1, start2, end2)
@@ -106,6 +118,7 @@ local cx, cy = 40, 40
 local baseLineParam = 30
 local circleRad = 255
 local p1, p2, p3, p4
+local vertLine
 
 -- расчет координат базовых линий построения. d - параметр отвечающий за
 -- расстояние между горизонталью и центром рисунка.
@@ -119,18 +132,43 @@ function love.load()
     -- вызов только для прерасчета координат центра рисунка в bhupur.center.x,
     -- bhupur.center.y
     bhupur.draw(cx, cy, h - cx * 2)
+    calculate()
+end
+
+function calculate()
     setupBaseLines(baseLineParam)
+
+    local circleCenter = vector(bhupur.center.x, bhupur.center.y)
+
+    vertLine = {vector(bhupur.center.x, bhupur.center.y - circleRad),
+        vector(bhupur.center.x, bhupur.center.y + circleRad)}
 
     p1, p2 = intersectionWithCircle(line1[1], line1[2],
         vector(bhupur.center.x, bhupur.center.y), circleRad)
     p3, p4 = intersectionWithCircle(line2[1], line2[2],
         vector(bhupur.center.x, bhupur.center.y), circleRad)
+
     line3 = {p1, vector(bhupur.center.x, bhupur.center.y + circleRad)}
     line4 = {p2, vector(bhupur.center.x, bhupur.center.y + circleRad)}
     line5 = {p3, vector(bhupur.center.x, bhupur.center.y - circleRad)}
     line6 = {p4, vector(bhupur.center.x, bhupur.center.y - circleRad)}
-    print("p1", inspect(p1))
-    print("p2", inspect(p2))
+
+    p5 = intersection(line1[1], line1[2], line6[1], line6[2])
+    p6 = intersection(line1[1], line1[2], line5[1], line5[2])
+
+    p7 = intersection(line2[1], line2[2], vertLine[1], vertLine[2])
+
+    local dir
+    -- 250 - конеч отрезка должен выходить за окружность
+    dir = (p7 - p5):normalizeInplace() * 250
+    line7 = copy({p5, p7 + dir})
+    p8 = intersectionWithCircle(line7[1], line7[2], circleCenter, circleRad)
+    -- 250 - конеч отрезка должен выходить за окружность
+    dir = (p7 - p6):normalizeInplace() * 250
+    line8 = copy({p6, p7 + dir})
+    p9 = intersectionWithCircle(line8[1], line8[2], circleCenter, circleRad)
+
+    line9 = {p8, p9}
 end
 
 function love.draw()
@@ -154,6 +192,26 @@ function love.draw()
     drawVecLine(line4)
     drawVecLine(line5)
     drawVecLine(line6)
+    drawVecLine(vertLine)
+    drawVecLine(line7)
+    drawVecLine(line8)
+    drawVecLine(line9)
+
+    if p5 then
+        lg.circle("fill", p5.x, p5.y, 3)
+    end
+    if p6 then
+        lg.circle("fill", p6.x, p6.y, 3)
+    end
+    if p7 then
+        lg.circle("fill", p7.x, p7.y, 3)
+    end
+    if p8 then
+        lg.circle("fill", p8.x, p8.y, 3)
+    end
+    if p9 then
+        lg.circle("fill", p9.x, p9.y, 3)
+    end
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
     linesbuf:draw()
@@ -168,9 +226,9 @@ function love.keypressed(_, key)
         love.event.quit()
     elseif key == "up" then
         baseLineParam = baseLineParam + 1
-        setupBaseLines(baseLineParam)
+        calculate()
     elseif key == "down" then
         baseLineParam = baseLineParam - 1
-        setupBaseLines(baseLineParam)
+        calculate()
     end
 end
