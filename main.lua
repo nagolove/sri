@@ -168,6 +168,8 @@ function calculate()
     line8 = copy({p6, p7 + dir})
     p9 = intersectionWithCircle(line8[1], line8[2], circleCenter, circleRad)
 
+    p10 = intersection(line1[1], line1[2], vertLine[1], vertLine[2])
+
     line9 = {p8, p9}
 end
 
@@ -211,6 +213,10 @@ function love.draw()
     end
     if p9 then
         lg.circle("fill", p9.x, p9.y, 3)
+    end
+    if p10 then
+        lg.setColor{0.8, 0, 0.2}
+        lg.circle("fill", p10.x, p10.y, 3)
     end
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
