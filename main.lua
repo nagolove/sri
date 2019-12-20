@@ -200,6 +200,18 @@ function calculate()
 
     dir = (p17 - p15):normalizeInplace() * 130
     line16 = copy{p15, p17 + dir}
+
+    p18 = p11:clone()
+    p19 = p12:clone()
+    dir = (p19 - p18):normalizeInplace() * 100
+    p19 = p19 + dir
+    dir = (p18 - p19):normalizeInplace() * 100
+    p18 = p18 + dir
+
+    -- провести прямую через точки p11 и p12
+    line17 = copy{p18, p19}
+
+    p20 = intersection(line17[1], line17[2], line16[1], line16[2])
 end
 
 function love.draw()
@@ -251,6 +263,7 @@ function love.draw()
     drawVecLine(line16) 
     drawVecLine(line17) 
 
+    lg.setColor{1, 0, 1}
     if p5 then
         lg.circle("fill", p5.x, p5.y, 3)
     end
@@ -267,16 +280,16 @@ function love.draw()
         lg.circle("fill", p9.x, p9.y, 3)
     end
     if p10 then
-        lg.setColor{0.8, 0, 0.2}
         lg.circle("fill", p10.x, p10.y, 3)
     end
-    lg.setColor{1, 0, 1}
+    --lg.setColor{0, 0, 1}
     if p11 then
         lg.circle("fill", p11.x, p11.y, 3)
     end
     if p12 then
         lg.circle("fill", p12.x, p12.y, 3)
     end
+    --lg.setColor{1, 0, 1}
     if p13 then
         lg.circle("fill", p13.x, p14.y, 3)
     end
@@ -290,6 +303,9 @@ function love.draw()
         lg.circle("fill", p16.x, p16.y, 3)
     end
     if p17 then
+        lg.circle("fill", p17.x, p17.y, 3)
+    end
+    if p20 then
         lg.circle("fill", p17.x, p17.y, 3)
     end
 
