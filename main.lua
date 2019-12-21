@@ -148,10 +148,10 @@ function calculate()
     p3, p4 = intersectionWithCircle(line2[1], line2[2],
         vector(bhupur.center.x, bhupur.center.y), circleRad)
 
-    line3 = {p1, vector(bhupur.center.x, bhupur.center.y + circleRad)}
-    line4 = {p2, vector(bhupur.center.x, bhupur.center.y + circleRad)}
-    line5 = {p3, vector(bhupur.center.x, bhupur.center.y - circleRad)}
-    line6 = {p4, vector(bhupur.center.x, bhupur.center.y - circleRad)}
+    line3 = copy{p1, vector(bhupur.center.x, bhupur.center.y + circleRad)}
+    line4 = copy{p2, vector(bhupur.center.x, bhupur.center.y + circleRad)}
+    line5 = copy{p3, vector(bhupur.center.x, bhupur.center.y - circleRad)}
+    line6 = copy{p4, vector(bhupur.center.x, bhupur.center.y - circleRad)}
 
     p5 = intersection(line1[1], line1[2], line6[1], line6[2])
     p6 = intersection(line1[1], line1[2], line5[1], line5[2])
@@ -159,18 +159,22 @@ function calculate()
     p7 = intersection(line2[1], line2[2], vertLine[1], vertLine[2])
 
     local dir
-    -- 250 - конеч отрезка должен выходить за окружность
+
+    -- 250 - конец отрезка должен выходить за окружность
     dir = (p7 - p5):normalizeInplace() * 250
     line7 = copy({p5, p7 + dir})
+
     p8 = intersectionWithCircle(line7[1], line7[2], circleCenter, circleRad)
-    -- 250 - конеч отрезка должен выходить за окружность
+
+    -- 250 - конец отрезка должен выходить за окружность
     dir = (p7 - p6):normalizeInplace() * 250
     line8 = copy({p6, p7 + dir})
+
     p9 = intersectionWithCircle(line8[1], line8[2], circleCenter, circleRad)
 
     p10 = intersection(line1[1], line1[2], vertLine[1], vertLine[2])
 
-    line9 = {p8, p9}
+    line9 = copy{p8, p9}
 
     line10 = copy{p8, p10}
     line11 = copy{p9, p10}
@@ -208,10 +212,14 @@ function calculate()
     dir = (p18 - p19):normalizeInplace() * 100
     p18 = p18 + dir
 
-    -- провести прямую через точки p11 и p12
+    -- провести прямую через точки p18 и p19 взятых копией точек p11, p12
+    -- вспомогательная прямая, можно не рисовать
     line17 = copy{p18, p19}
 
     p20 = intersection(line17[1], line17[2], line16[1], line16[2])
+    p21 = intersection(line17[1], line17[2], line15[1], line15[2])
+
+    line18 = copy{p20, p21}
 end
 
 function love.draw()
@@ -259,9 +267,15 @@ function love.draw()
     -- горизонталь второго треугольника вершиной вниз
     drawVecLine(line14) 
 
+    --lg.setColor{1, 0, 1}
+    -- левая сторон треугольника вершиной вверх, не обрезанная
     drawVecLine(line15) 
-    drawVecLine(line16) 
-    drawVecLine(line17) 
+    -- правая сторона треугольника вершиной вверх, не обрезанная
+    drawVecLine(line16)
+    -- основание треугольника вершиной вверх, не обрезанное
+    drawVecLine(line17)  
+    lg.setColor{0, 0, 1}
+    drawVecLine(line18)  
 
     lg.setColor{1, 0, 1}
     if p5 then
@@ -306,7 +320,10 @@ function love.draw()
         lg.circle("fill", p17.x, p17.y, 3)
     end
     if p20 then
-        lg.circle("fill", p17.x, p17.y, 3)
+        lg.circle("fill", p20.x, p20.y, 3)
+    end
+    if p21 then
+        lg.circle("fill", p21.x, p21.y, 3)
     end
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
