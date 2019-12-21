@@ -112,9 +112,9 @@ end
 
 -- эти линии должны соотноситься с центром рисунка
 local line1, line2, line3, line4, line5, line6
-local h = lg.getHeight()
+local w, h = lg.getDimensions()
 -- убрать эти переменные, слишком употребительные имена, вносящие путаницу
-local cx, cy = 40, 40
+local cx, cy = w / 2, h / 2
 local baseLineParam = 60
 local circleRad = 255
 local p1, p2, p3, p4
@@ -123,7 +123,7 @@ local vertLine
 -- расчет координат базовых линий построения. d - параметр отвечающий за
 -- расстояние между горизонталью и центром рисунка.
 function setupBaseLines(d)
-    local cx, cy = bhupur.center.x, bhupur.center.y
+    --local cx, cy = bhupur.center.x, bhupur.center.y
     line1 = {vector(40, cy - d), vector(560, cy - d)}
     line2 = {vector(40, cy + d), vector(560, cy + d)}
 end
@@ -131,27 +131,26 @@ end
 function love.load()
     -- вызов только для прерасчета координат центра рисунка в bhupur.center.x,
     -- bhupur.center.y
-    bhupur.draw(cx, cy, h - cx * 2)
+    --bhupur.draw(cx, cy, h - cx * 2)
     calculate()
 end
 
 function calculate()
     setupBaseLines(baseLineParam)
 
-    local circleCenter = vector(bhupur.center.x, bhupur.center.y)
+    local circleCenter = vector(cx, cy)
 
-    vertLine = {vector(bhupur.center.x, bhupur.center.y - circleRad),
-        vector(bhupur.center.x, bhupur.center.y + circleRad)}
+    vertLine = {vector(cx, cy - circleRad), vector(cx, cy + circleRad)}
 
-    p1, p2 = intersectionWithCircle(line1[1], line1[2],
-        vector(bhupur.center.x, bhupur.center.y), circleRad)
-    p3, p4 = intersectionWithCircle(line2[1], line2[2],
-        vector(bhupur.center.x, bhupur.center.y), circleRad)
+    p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy), 
+        circleRad)
+    p3, p4 = intersectionWithCircle(line2[1], line2[2], vector(cx, cy), 
+        circleRad)
 
-    line3 = copy{p1, vector(bhupur.center.x, bhupur.center.y + circleRad)}
-    line4 = copy{p2, vector(bhupur.center.x, bhupur.center.y + circleRad)}
-    line5 = copy{p3, vector(bhupur.center.x, bhupur.center.y - circleRad)}
-    line6 = copy{p4, vector(bhupur.center.x, bhupur.center.y - circleRad)}
+    line3 = copy{p1, vector(cx, cy + circleRad)}
+    line4 = copy{p2, vector(cx, cy + circleRad)}
+    line5 = copy{p3, vector(cx, cy - circleRad)}
+    line6 = copy{p4, vector(cx, cy - circleRad)}
 
     p5 = intersection(line1[1], line1[2], line6[1], line6[2])
     p6 = intersection(line1[1], line1[2], line5[1], line5[2])
@@ -223,14 +222,17 @@ function calculate()
 end
 
 function love.draw()
-    bhupur.draw(cx, cy, h - cx * 2)
+    --bhupur.draw(cx, cy, h - cx * 2)
+
+    local w, h = lg.getDimensions()
+    bhupur.draw2(w / 2, h / 2, h)
 
     lg.setColor{0.13, 0.95, 0.1}
-    lg.circle("fill", bhupur.center.x, bhupur.center.y, 3)
+    lg.circle("fill", cx, cy, 3)
 
     lg.setColor{1, 1, 1}
     -- нужно вычислить подходящий радиус окружности автоматически
-    lg.circle("line", bhupur.center.x, bhupur.center.y, circleRad)
+    lg.circle("line", cx, cy, circleRad)
 
     lg.circle("fill", p1.x, p1.y, 3)
     lg.circle("fill", p2.x, p2.y, 3)
@@ -334,7 +336,25 @@ function love.update(dt)
     linesbuf:update(dt)
 end
 
+function love.resize(neww, newh)
+    calculate()
+end
+
 function love.keypressed(_, key)
+    -- переключение режимов экрана
+    if love.keyboard.isDown("ralt", "lalt") and key == "return" then
+        -- код дерьмовый, но работает
+        if screenMode == "fs" then
+            love.window.setMode(800, 600, {fullscreen = false})
+            screenMode = "win"
+            --dispatchWindowResize(love.graphics.getDimensions())
+        else
+            love.window.setMode(0, 0, {fullscreen = true,
+                                       fullscreentype = "exclusive"})
+            screenMode = "fs"
+            --dispatchWindowResize(love.graphics.getDimensions())
+        end
+    end
     if key == "escape" then
         love.event.quit()
     elseif key == "up" then
