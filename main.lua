@@ -118,7 +118,7 @@ local w, h = lg.getDimensions()
 -- центр построения
 local cx, cy
 local baseLineParam = 60
-local circleRad = 255
+local circleRad
 local p1, p2, p3, p4
 local vertLine
 
@@ -154,7 +154,6 @@ end
 
 function love.load()
     resize(w, h)
-    calculate()
 end
 
 function calculate()
@@ -242,6 +241,24 @@ function calculate()
     p21 = intersection(line17[1], line17[2], line15[1], line15[2])
 
     line18 = copy{p20, p21}
+
+    p22 = intersection(line15[1], line15[2], line1[1], line1[2])
+    p23 = intersection(line16[1], line16[2], line1[1], line1[2])
+
+    dir = (p22 - p13):normalizeInplace() * 600
+    -- вспомогательная линия
+    line19 = copy{p13, p13 + dir} -- правый отрезок
+
+    p24 = intersection(line19[1], line19[2], vertLine[1], vertLine[2])
+
+    dir = (p23 - p14):normalizeInplace() * 600
+    -- вспомогательная линия
+    line20 = copy{p14, p14 + dir} -- левый отрезок
+
+    p25 = intersection(line20[1], line20[2], vertLine[1], vertLine[2])
+
+    line21 = copy{p13, p24}
+    line22 = copy{p14, p25}
 end
 
 function love.draw()
@@ -305,9 +322,14 @@ function love.draw()
     drawVecLine(line16)
     -- основание треугольника вершиной вверх, не обрезанное
     drawVecLine(line17)  
-    lg.setColor{0, 0, 1}
     drawVecLine(line18)  
 
+    --drawVecLine(line19)
+    --drawVecLine(line20)
+
+    drawVecLine(line21)
+    drawVecLine(line22)
+    
     lg.setColor{1, 0, 1}
     if p5 then
         lg.circle("fill", p5.x, p5.y, 3)
@@ -355,6 +377,18 @@ function love.draw()
     end
     if p21 then
         lg.circle("fill", p21.x, p21.y, 3)
+    end
+    if p22 then
+        lg.circle("fill", p22.x, p22.y, 3)
+    end
+    if p23 then
+        lg.circle("fill", p23.x, p23.y, 3)
+    end
+    if p24 then
+        lg.circle("fill", p24.x, p24.y, 3)
+    end
+    if p25 then
+        lg.circle("fill", p25.x, p25.y, 3)
     end
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
