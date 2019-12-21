@@ -103,6 +103,8 @@ end
 -- на вход принимает либо пару векторов(два параметра функции) либо таблицу
 -- с парой векторов по индексам 1 и 2 соответственно(один параметр функции)
 function drawVecLine(p1, p2)
+    if not p1 then return end
+
     if p1 and not p2 and type(p1) == "table" then
         lg.line(p1[1].x, p1[1].y, p1[2].x, p1[2].y)
     elseif p1 and p2 then
@@ -120,6 +122,7 @@ local circleRad = 255
 local p1, p2, p3, p4
 local vertLine
 
+-- d - расстояние от центра до горизонталей больших треугольников
 function setupBaseLines(d)
     -- тут нужно поменять код, что-бы вычисления шли через точки пересечения
     -- окружности и отрезка. Порядок такой:
@@ -129,14 +132,28 @@ function setupBaseLines(d)
     -- * найти точку пересечения
     -- * повторить для для правой стороны
     -- * задать линию из точек пересечения
-    line1 = {vector(40, cy - d), vector(560, cy - d)}
-    line2 = {vector(40, cy + d), vector(560, cy + d)}
+
+    local upPoint, downPoint = vector(cx, cy - d), vector(cx, cy + d)
+    local leftPoint, rightPoint
+
+    leftPoint = upPoint + vector(-1, 0) * circleRad
+    rightPoint = upPoint + vector(1, 0) * circleRad
+
+    local p1, p2 = intersectionWithCircle(leftPoint, rightPoint, 
+        vector(cx, cy), circleRad)
+
+    leftPoint = downPoint + vector(-1, 0) * circleRad
+    rightPoint = downPoint + vector(1, 0) * circleRad
+
+    local p3, p4 = intersectionWithCircle(leftPoint, rightPoint, 
+        vector(cx, cy), circleRad)
+
+    line1 = copy{p1, p2}
+    line2 = copy{p3, p4}
 end
 
 function love.load()
-    -- вызов только для прерасчета координат центра рисунка в bhupur.center.x,
-    -- bhupur.center.y
-    --bhupur.draw(cx, cy, h - cx * 2)
+    setupBaseLines(baseLineParam)
     calculate()
 end
 
@@ -239,10 +256,18 @@ function love.draw()
     -- нужно вычислить подходящий радиус окружности автоматически
     lg.circle("line", cx, cy, circleRad)
 
-    lg.circle("fill", p1.x, p1.y, 3)
-    lg.circle("fill", p2.x, p2.y, 3)
-    lg.circle("fill", p3.x, p3.y, 3)
-    lg.circle("fill", p4.x, p4.y, 3)
+    if p1 then
+        lg.circle("fill", p1.x, p1.y, 3)
+    end
+    if p2 then
+        lg.circle("fill", p2.x, p2.y, 3)
+    end
+    if p3 then
+        lg.circle("fill", p3.x, p3.y, 3)
+    end
+    if p4 then
+        lg.circle("fill", p4.x, p4.y, 3)
+    end
 
     drawVecLine(vertLine)
     -- горизонталь большого треугольника вершиной вниз
