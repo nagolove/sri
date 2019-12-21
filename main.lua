@@ -115,8 +115,8 @@ end
 -- эти линии должны соотноситься с центром рисунка
 local line1, line2, line3, line4, line5, line6
 local w, h = lg.getDimensions()
--- убрать эти переменные, слишком употребительные имена, вносящие путаницу
-local cx, cy = w / 2, h / 2
+-- центр построения
+local cx, cy
 local baseLineParam = 60
 local circleRad = 255
 local p1, p2, p3, p4
@@ -153,11 +153,12 @@ function setupBaseLines(d)
 end
 
 function love.load()
-    setupBaseLines(baseLineParam)
+    resize(w, h)
     calculate()
 end
 
 function calculate()
+    cx, cy = w / 2, h / 2
     setupBaseLines(baseLineParam)
 
     local circleCenter = vector(cx, cy)
@@ -182,13 +183,13 @@ function calculate()
     local dir
 
     -- 250 - конец отрезка должен выходить за окружность
-    dir = (p7 - p5):normalizeInplace() * 250
+    dir = (p7 - p5):normalizeInplace() * circleRad
     line7 = copy({p5, p7 + dir})
 
     p8 = intersectionWithCircle(line7[1], line7[2], circleCenter, circleRad)
 
     -- 250 - конец отрезка должен выходить за окружность
-    dir = (p7 - p6):normalizeInplace() * 250
+    dir = (p7 - p6):normalizeInplace() * circleRad
     line8 = copy({p6, p7 + dir})
 
     p9 = intersectionWithCircle(line8[1], line8[2], circleCenter, circleRad)
@@ -220,17 +221,17 @@ function calculate()
     p16 = intersection(line4[1], line4[2], line2[1], line2[2])
     p17 = intersection(line3[1], line3[2], line2[1], line2[2])
 
-    dir = (p16 - p15):normalizeInplace() * 130
+    dir = (p16 - p15):normalizeInplace() * circleRad
     line15 = copy{p15, p16 + dir}
 
-    dir = (p17 - p15):normalizeInplace() * 130
+    dir = (p17 - p15):normalizeInplace() * circleRad
     line16 = copy{p15, p17 + dir}
 
     p18 = p11:clone()
     p19 = p12:clone()
-    dir = (p19 - p18):normalizeInplace() * 100
+    dir = (p19 - p18):normalizeInplace() * circleRad
     p19 = p19 + dir
-    dir = (p18 - p19):normalizeInplace() * 100
+    dir = (p18 - p19):normalizeInplace() * circleRad
     p18 = p18 + dir
 
     -- провести прямую через точки p18 и p19 взятых копией точек p11, p12
@@ -244,10 +245,8 @@ function calculate()
 end
 
 function love.draw()
-    --bhupur.draw(cx, cy, h - cx * 2)
-
     local w, h = lg.getDimensions()
-    bhupur.draw2(w / 2, h / 2, h)
+    bhupur.draw(w / 2, h / 2, h)
 
     lg.setColor{0.13, 0.95, 0.1}
     lg.circle("fill", cx, cy, 3)
@@ -366,7 +365,10 @@ function love.update(dt)
     linesbuf:update(dt)
 end
 
-function love.resize(neww, newh)
+function resize(neww, newh)
+    w, h = neww, newh
+    circleRad = 0.4 * h
+    print("circleRad", circleRad)
     calculate()
 end
 
@@ -377,12 +379,12 @@ function love.keypressed(_, key)
         if screenMode == "fs" then
             love.window.setMode(800, 600, {fullscreen = false})
             screenMode = "win"
-            --dispatchWindowResize(love.graphics.getDimensions())
+            resize(love.graphics.getDimensions())
         else
             love.window.setMode(0, 0, {fullscreen = true,
                                        fullscreentype = "exclusive"})
             screenMode = "fs"
-            --dispatchWindowResize(love.graphics.getDimensions())
+            resize(love.graphics.getDimensions())
         end
     end
     if key == "escape" then
