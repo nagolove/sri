@@ -1,6 +1,6 @@
 -- [[
--- Общие параметры - диаметр окружности, ширина квадрата защиты, базовое
--- расстояние.
+-- Общие параметры - диаметр вписанной в квадрат защиты окружности, 
+-- ширина квадрата защиты
 -- ]]
 local inspect = require "inspect"
 local vector = require "vector"
@@ -70,25 +70,26 @@ function intersection(start1, end1, start2, end2)
     return start1 + u*dir1;
 end
 
+-- возвращает два или одно значение точек пересечения в виде векторов или nil
 -- p1, p2 - начальная точка(вектор) и конечная
 -- center - вектор центра окружности
 -- rad - радиус окружности
--- возвращает два или одно значение точек пересечения в виде векторов или nil
 -- источник: http://csharphelper.com/blog/2014/09/determine-where-a-line-intersects-a-circle-in-c/
 function intersectionWithCircle(p1, p2, center, rad)
-    local t
-    local dx = p2.x - p1.x;
-    local dy = p2.y - p1.y;
+    local dx, dy = p2.x - p1.x, p2.y - p1.y
     local a = dx * dx + dy * dy;
     local b = 2 * (dx * (p1.x - center.x) + dy * (p1.y - center.y));
     local c = (p1.x - center.x) * (p1.x - center.x) + 
         (p1.y - center.y) * (p1.y - center.y) - rad * rad;
 
+    local t
     local det = b * b - 4 * a * c
+
     --if ((a <= 0.0000001) || (det < 0))
     if a <= 0.0001 or det < 0 then
         return nil
-    elseif det == 0 then -- проверь, может быть равен нулю? Или сделать сравнение?
+    -- проверь, может быть равен нулю? Или сделать сравнение?
+    elseif det == 0 then 
         t = -b / (2 * a)
         return vector(p1.x + t * dx, p1.y + t * dy)
     else
@@ -156,6 +157,10 @@ function love.load()
     resize(w, h)
 end
 
+-- [[
+-- Попробуй сделать класс sri, в котором будет метод calculate. Создай в нем
+-- еще чистовой набор точек и чистовую функцию рисовки.
+-- ]]
 function calculate()
     cx, cy = w / 2, h / 2
     setupBaseLines(baseLineParam)
@@ -261,6 +266,12 @@ function calculate()
     line22 = copy{p14, p25}
 end
 
+function drawPoint(point)
+    if point then
+        lg.circle("fill", point.x, point.y, 3)
+    end
+end
+
 function love.draw()
     local w, h = lg.getDimensions()
     bhupur.draw(w / 2, h / 2, h)
@@ -331,65 +342,26 @@ function love.draw()
     drawVecLine(line22)
     
     lg.setColor{1, 0, 1}
-    if p5 then
-        lg.circle("fill", p5.x, p5.y, 3)
-    end
-    if p6 then
-        lg.circle("fill", p6.x, p6.y, 3)
-    end
-    if p7 then
-        lg.circle("fill", p7.x, p7.y, 3)
-    end
-    if p8 then
-        lg.circle("fill", p8.x, p8.y, 3)
-    end
-    if p9 then
-        lg.circle("fill", p9.x, p9.y, 3)
-    end
-    if p10 then
-        lg.circle("fill", p10.x, p10.y, 3)
-    end
-    --lg.setColor{0, 0, 1}
-    if p11 then
-        lg.circle("fill", p11.x, p11.y, 3)
-    end
-    if p12 then
-        lg.circle("fill", p12.x, p12.y, 3)
-    end
-    --lg.setColor{1, 0, 1}
-    if p13 then
-        lg.circle("fill", p13.x, p14.y, 3)
-    end
-    if p14 then
-        lg.circle("fill", p14.x, p14.y, 3)
-    end
-    if p15 then
-        lg.circle("fill", p15.x, p15.y, 3)
-    end
-    if p16 then
-        lg.circle("fill", p16.x, p16.y, 3)
-    end
-    if p17 then
-        lg.circle("fill", p17.x, p17.y, 3)
-    end
-    if p20 then
-        lg.circle("fill", p20.x, p20.y, 3)
-    end
-    if p21 then
-        lg.circle("fill", p21.x, p21.y, 3)
-    end
-    if p22 then
-        lg.circle("fill", p22.x, p22.y, 3)
-    end
-    if p23 then
-        lg.circle("fill", p23.x, p23.y, 3)
-    end
-    if p24 then
-        lg.circle("fill", p24.x, p24.y, 3)
-    end
-    if p25 then
-        lg.circle("fill", p25.x, p25.y, 3)
-    end
+
+    drawPoint(p5)
+    drawPoint(p6)
+    drawPoint(p7)
+    drawPoint(p8)
+    drawPoint(p9)
+    drawPoint(p10)
+    drawPoint(p11)
+    drawPoint(p12)
+    drawPoint(p13)
+    drawPoint(p14)
+    drawPoint(p15)
+    drawPoint(p16)
+    drawPoint(p17)
+    drawPoint(p20)
+    drawPoint(p21)
+    drawPoint(p22)
+    drawPoint(p23)
+    drawPoint(p24)
+    drawPoint(p25)
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
     linesbuf:draw()
