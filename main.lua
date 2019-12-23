@@ -160,6 +160,8 @@ end
 -- [[
 -- Попробуй сделать класс sri, в котором будет метод calculate. Создай в нем
 -- еще чистовой набор точек и чистовую функцию рисовки.
+-- iline - внутренняя линия, используется при построении
+-- line - линия для чистовой рисовки
 -- ]]
 function calculate()
     cx, cy = w / 2, h / 2
@@ -262,8 +264,17 @@ function calculate()
 
     p25 = intersection(line20[1], line20[2], vertLine[1], vertLine[2])
 
-    line21 = copy{p13, p24}
-    line22 = copy{p14, p25}
+    line21 = copy{p13, p24} -- правая
+    line22 = copy{p14, p25} -- левая
+
+    -- левая точка
+    p26 = intersection(line5[1], line5[2], line22[1], line22[2])
+    -- правая точка 
+    p27 = intersection(line6[1], line6[2], line21[1], line21[2])
+
+    local dir1 = (p27 - p26):normalizeInplace() * 150
+    local dir2 = (p26 - p27):normalizeInplace() * 150
+    line23 = copy{p26 + dir2, p27 + dir1}
 end
 
 function drawPoint(point)
@@ -305,9 +316,9 @@ function love.draw()
     drawVecLine(line3) 
     -- левая сторона большого треугольника вершиной вниз
     drawVecLine(line4) 
-    -- правая сторона большого треугольника вершиной вверх
-    drawVecLine(line5) 
     -- левая сторона большого треугольника вершиной вверх
+    drawVecLine(line5) 
+    -- правая сторона большого треугольника вершиной вверх
     drawVecLine(line6) 
     -- первая вспомогательная линия до пересечения окружности справа снизу
     drawVecLine(line7) 
@@ -338,8 +349,13 @@ function love.draw()
     --drawVecLine(line19)
     --drawVecLine(line20)
 
+    -- правая строна треугольника с вершиной вниз
     drawVecLine(line21)
+    -- левая сторона треугольника с вершиной вниз
     drawVecLine(line22)
+
+    lg.setColor{0, 1, 0}
+    drawVecLine(line23)
     
     lg.setColor{1, 0, 1}
 
@@ -362,6 +378,8 @@ function love.draw()
     drawPoint(p23)
     drawPoint(p24)
     drawPoint(p25)
+    drawPoint(p26)
+    drawPoint(p27)
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
     linesbuf:draw()
