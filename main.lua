@@ -1,4 +1,5 @@
 -- [[
+-- vim: set foldmethod=manual
 -- Общие параметры - диаметр вписанной в квадрат защиты окружности, 
 -- ширина квадрата защиты
 -- ]]
@@ -114,8 +115,10 @@ function drawVecLine(p1, p2)
 end
 
 -- эти линии должны соотноситься с центром рисунка
-local line1, line2, line3, line4, line5, line6
+--local line1, line2, line3, line4, line5, line6
+
 local w, h = lg.getDimensions()
+
 -- центр построения
 local cx, cy
 local baseLineParam = 60
@@ -160,8 +163,10 @@ end
 -- [[
 -- Попробуй сделать класс sri, в котором будет метод calculate. Создай в нем
 -- еще чистовой набор точек и чистовую функцию рисовки.
--- iline - внутренняя линия, используется при построении
--- line - линия для чистовой рисовки
+-- lineX - внутренняя линия, используется при построении
+-- rlineX - линия для чистовой(release) рисовки
+-- pX - внутренняя точка
+-- rpX - чистовая точка
 -- ]]
 function calculate()
     cx, cy = w / 2, h / 2
@@ -180,6 +185,9 @@ function calculate()
     line4 = copy{p2, vector(cx, cy + circleRad)}
     line5 = copy{p3, vector(cx, cy - circleRad)}
     line6 = copy{p4, vector(cx, cy - circleRad)}
+
+    rline1, rline2, rline3, rline4, rline5, rline6 = copy(line1), copy(line2),
+        copy(line3), copy(line4), copy(line5), copy(line6)
 
     p5 = intersection(line1[1], line1[2], line6[1], line6[2])
     p6 = intersection(line1[1], line1[2], line5[1], line5[2])
@@ -283,30 +291,7 @@ function drawPoint(point)
     end
 end
 
-function love.draw()
-    local w, h = lg.getDimensions()
-    bhupur.draw(w / 2, h / 2, h)
-
-    lg.setColor{0.13, 0.95, 0.1}
-    lg.circle("fill", cx, cy, 3)
-
-    lg.setColor{1, 1, 1}
-    -- нужно вычислить подходящий радиус окружности автоматически
-    lg.circle("line", cx, cy, circleRad)
-
-    if p1 then
-        lg.circle("fill", p1.x, p1.y, 3)
-    end
-    if p2 then
-        lg.circle("fill", p2.x, p2.y, 3)
-    end
-    if p3 then
-        lg.circle("fill", p3.x, p3.y, 3)
-    end
-    if p4 then
-        lg.circle("fill", p4.x, p4.y, 3)
-    end
-
+function drawDebug()
     drawVecLine(vertLine)
     -- горизонталь большого треугольника вершиной вниз
     drawVecLine(line1) 
@@ -359,27 +344,40 @@ function love.draw()
     
     lg.setColor{1, 0, 1}
 
-    drawPoint(p5)
-    drawPoint(p6)
-    drawPoint(p7)
-    drawPoint(p8)
-    drawPoint(p9)
-    drawPoint(p10)
-    drawPoint(p11)
-    drawPoint(p12)
-    drawPoint(p13)
-    drawPoint(p14)
-    drawPoint(p15)
-    drawPoint(p16)
-    drawPoint(p17)
-    drawPoint(p20)
-    drawPoint(p21)
-    drawPoint(p22)
-    drawPoint(p23)
-    drawPoint(p24)
-    drawPoint(p25)
-    drawPoint(p26)
-    drawPoint(p27)
+    for i = 1, 27 do
+        local point = _G["p" .. i]
+        if point then drawPoint(point) end
+    end
+end
+
+function draw()
+    lg.setColor{0, 0.7, 0}
+    for i = 1, 10 do
+        local line = _G["rline" .. i]
+        if line then
+            drawVecLine(line)
+        end
+    end
+end
+
+local releaseMode = true
+
+function love.draw()
+    local w, h = lg.getDimensions()
+    bhupur.draw(w / 2, h / 2, h)
+
+    lg.setColor{0.13, 0.95, 0.1}
+    lg.circle("fill", cx, cy, 3)
+
+    lg.setColor{1, 1, 1}
+    -- нужно вычислить подходящий радиус окружности автоматически
+    lg.circle("line", cx, cy, circleRad)
+
+    if releaseMode then
+        draw()
+    else
+        drawDebug()
+    end
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
     linesbuf:draw()
@@ -419,5 +417,7 @@ function love.keypressed(_, key)
     elseif key == "down" then
         baseLineParam = baseLineParam - 1
         calculate()
+    elseif key == "r" then
+        releaseMode = not releaseMode
     end
 end
