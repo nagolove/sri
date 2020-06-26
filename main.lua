@@ -8,6 +8,7 @@ local vector = require "vector"
 local linesbuf = require "kons".new()
 local bhupur = require "bhupur"
 local lg = love.graphics
+local sri_lines
 
 -- Возвращает истину если точка с координатами px и py находится в круге 
 -- радиуса cr и координатами cx и cy
@@ -196,6 +197,15 @@ end
 function construct()
     local result = {}
 
+    local cx, cy = w / 2, h / 2
+    local line1, line2 = getBaseLines(cx, cy, baseLineParam)
+    local circleCenter = vector(cx, cy)
+
+    local vertLine = {vector(cx, cy - circleRad), vector(cx, cy + circleRad)}
+    local p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy),
+        circleRad)
+
+    return result
 end
 
 -- [[
@@ -330,6 +340,14 @@ function drawPoint(point)
     end
 end
 
+function draw_lines(lines)
+    if lines then
+        for k, line in ipairs(lines) do
+            drawVecLine(line)
+        end
+    end
+end
+
 function drawDebug()
     drawVecLine(vertLine)
     -- горизонталь большого треугольника вершиной вниз
@@ -400,6 +418,7 @@ function draw()
 end
 
 local releaseMode = true
+local newMode = false
 
 function love.draw()
     local w, h = lg.getDimensions()
@@ -412,10 +431,14 @@ function love.draw()
     -- нужно вычислить подходящий радиус окружности автоматически
     lg.circle("line", cx, cy, circleRad)
 
-    if releaseMode then
-        draw()
+    if new_mode then
+        draw_lines(lines)
     else
-        drawDebug()
+        if releaseMode then
+            draw()
+        else
+            drawDebug()
+        end
     end
 
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
@@ -460,5 +483,7 @@ function love.keypressed(_, key)
         love.event.quit()
     elseif key == "r" then
         releaseMode = not releaseMode
+    elseif key == "n" then
+        new_mode = not new_mode
     end
 end
