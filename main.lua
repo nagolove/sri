@@ -127,7 +127,7 @@ local p1, p2, p3, p4
 local vertLine
 
 -- d - расстояние от центра до горизонталей больших треугольников
-function setupBaseLines(d)
+function setupBaseLines(cx, cy, d)
     -- тут нужно поменять код, что-бы вычисления шли через точки пересечения
     -- окружности и отрезка. Порядок такой:
     -- * поднять точку на сколько нужно пикселей
@@ -156,8 +156,46 @@ function setupBaseLines(d)
     line2 = copy{p3, p4}
 end
 
+-- d - расстояние от центра до горизонталей больших треугольников
+-- d - расстояние от центра до горизонталей больших треугольников
+function getBaseLines(cx, cy, d)
+    -- тут нужно поменять код, что-бы вычисления шли через точки пересечения
+    -- окружности и отрезка. Порядок такой:
+    -- * поднять точку на сколько нужно пикселей
+    -- * пустить отрезок влево до пересечения с окружностью(кидать с запасом
+    -- по пикселям)
+    -- * найти точку пересечения
+    -- * повторить для для правой стороны
+    -- * задать линию из точек пересечения
+
+    local upPoint, downPoint = vector(cx, cy - d), vector(cx, cy + d)
+    local leftPoint, rightPoint
+
+    leftPoint = upPoint + vector(-1, 0) * circleRad
+    rightPoint = upPoint + vector(1, 0) * circleRad
+
+    local p1, p2 = intersectionWithCircle(leftPoint, rightPoint, 
+        vector(cx, cy), circleRad)
+
+    leftPoint = downPoint + vector(-1, 0) * circleRad
+    rightPoint = downPoint + vector(1, 0) * circleRad
+
+    local p3, p4 = intersectionWithCircle(leftPoint, rightPoint, 
+        vector(cx, cy), circleRad)
+
+    local line1 = copy{p1, p2}
+    local line2 = copy{p3, p4}
+    return line1, line2
+end
+
 function love.load()
     resize(w, h)
+end
+
+-- returns array with lines and array with points
+function construct()
+    local result = {}
+
 end
 
 -- [[
@@ -170,7 +208,8 @@ end
 -- ]]
 function calculate()
     cx, cy = w / 2, h / 2
-    setupBaseLines(baseLineParam)
+    --setupBaseLines(cx, cy, baseLineParam)
+    line1, line2 = getBaseLines(cx, cy, baseLineParam)
 
     local circleCenter = vector(cx, cy)
 
@@ -385,6 +424,14 @@ end
 
 function love.update(dt)
     linesbuf:update(dt)
+    local kb = love.keyboard
+    if kb.isDown("up") then
+        baseLineParam = baseLineParam + 1
+        calculate()
+    elseif kb.isDown("down") then
+        baseLineParam = baseLineParam - 1
+        calculate()
+    end
 end
 
 function resize(neww, newh)
@@ -411,12 +458,6 @@ function love.keypressed(_, key)
     end
     if key == "escape" then
         love.event.quit()
-    elseif key == "up" then
-        baseLineParam = baseLineParam + 1
-        calculate()
-    elseif key == "down" then
-        baseLineParam = baseLineParam - 1
-        calculate()
     elseif key == "r" then
         releaseMode = not releaseMode
     end
