@@ -197,28 +197,63 @@ end
 
 -- returns array with lines and array with points
 function construct()
+    ------------------- TESTING ONLY CODE -----------------
+    local testCanvas = lg.newCanvas()
+    local stageNum = 0
+    love.filesystem.createDirectory("stages")
+
+    lg.setCanvas(testCanvas)
+
+    function stageShot(...)
+        local args = {...}
+        lg.setColor{0, 0, 1}
+        for k, v in pairs(args) do
+            if v[1] and v[2] then
+                lg.line(v[1].x, v[1].y, v[2].x, v[2].y)
+            else -- point only
+                lg.setColor{0, 0, 0.7}
+                lg.circle("fill", v.x, v.y, 3)
+            end
+        end
+        lg.setCanvas()
+        print("stageNum", stageNum)
+        testCanvas:newImageData():encode("png", "stages/" .. stageNum)
+        stageNum = stageNum + 1
+        lg.setCanvas(testCanvas)
+    end
+    ------------------- END TESTING ONLY CODE -----------------
+
     local result = {}
 
     local cx, cy = w / 2, h / 2
     local line1, line2 = getBaseLines(cx, cy, baseLineParam)
+
+    stageShot(line1, line2)
+
     local circleCenter = vector(cx, cy)
 
-    local vertLine = {vector(cx, cy - circleRad), vector(cx, cy + circleRad)}
-    local p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy),
-        circleRad)
+    stageShot(circleCenter)
 
-    local p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy), 
-    circleRad)
-    local p3, p4 = intersectionWithCircle(line2[1], line2[2], vector(cx, cy), 
-    circleRad)
+    local vertLine = {vector(cx, cy - circleRad), vector(cx, cy + circleRad)}
+
+    stageShot(vertLine)
+
+    local p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy), circleRad)
+    local p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy), circleRad)
+    local p3, p4 = intersectionWithCircle(line2[1], line2[2], vector(cx, cy), circleRad)
 
     local line3 = copy{p1, vector(cx, cy + circleRad)}
     local line4 = copy{p2, vector(cx, cy + circleRad)}
     local line5 = copy{p3, vector(cx, cy - circleRad)}
     local line6 = copy{p4, vector(cx, cy - circleRad)}
 
+    stageShot(line3) 
+    stageShot(line4)
+    stageShot(line5)
+    stageShot(line6)
+
     local rline1, rline2, rline3, rline4, rline5, rline6 = copy(line1), copy(line2),
-    copy(line3), copy(line4), copy(line5), copy(line6)
+        copy(line3), copy(line4), copy(line5), copy(line6)
 
     local p5 = intersection(line1[1], line1[2], line6[1], line6[2])
     local p6 = intersection(line1[1], line1[2], line5[1], line5[2])
