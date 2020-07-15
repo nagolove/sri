@@ -515,8 +515,8 @@ function construct()
     local line28 = copy{p40, p40 + dir1}
     local line29 = copy{p41, p41 + dir2}
 
-    local p42 = intersection(line28[1], line28[2], line_tri7_left[1], line_tri7_right[2])
-    local p43 = intersection(line29[1], line29[2], line_tri7_right[1], line_tri7_right[2])
+    local p42 = intersection(line28[1], line28[2], line_tri8_left[1], line_tri8_right[2])
+    local p43 = intersection(line29[1], line29[2], line_tri8_right[1], line_tri8_right[2])
 
     stageShot(line28, "line28")
     stageShot(line29, "line29")
