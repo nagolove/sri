@@ -9,20 +9,7 @@ local linesbuf = require "kons".new()
 local bhupur = require "bhupur"
 local lg = love.graphics
 local canvas = lg.newCanvas()
-local visible = false
-
--- Возвращает истину если точка с координатами px и py находится в круге 
--- радиуса cr и координатами cx и cy
-local function pointInCircle(px, py, cx, cy, cr)
-  return (px - cx)^2 + (py - cy)^2 <= cr ^ 2
-end
-
--- длина нормали со знаком от точки c к прямой, образованной p1 и p2
--- параметры - hump.vector
-local function nearestDist(c, p1, p2)
-  local tmp = p2 - p1
-  return tmp:cross(c - p1) / tmp:len()
-end
+local visible = true
 
 function copy(tbl)
     local result = {}
@@ -249,6 +236,7 @@ function construct()
         lg.setCanvas(testCanvas)
     end
     ------------------- END TESTING ONLY CODE -----------------
+    stageShot = function() end
 
     local cx, cy = w / 2, h / 2
     local line_tri1_top, line_tri2_bottom = getBaseLines(cx, cy, baseLineParam)
@@ -381,8 +369,8 @@ function construct()
     stageShot("(1,0,1)", line_tri5_left, "line_tri5_left")
     stageShot("(1,0,1)", line_tri5_right, "line_tri5_right")
 
-    local p22 = intersection(line15[1], line15[2], line1[1], line1[2])
-    local p23 = intersection(line16[1], line16[2], line1[1], line1[2])
+    local p22 = intersection(line15[1], line15[2], line_tri1_top[1], line_tri1_top[2])
+    local p23 = intersection(line16[1], line16[2], line_tri1_top[1], line_tri1_top[2])
 
     -- вспомогательная линия
     dir = (p22 - p13):normalizeInplace() * 600
@@ -415,8 +403,8 @@ function construct()
     -- правая точка 
     local p27 = intersection(line_tri2_right[1], line_tri2_right[2], line_tri4_right[1], line_tri4_right[2])
 
-    local dir1 = (p27 - p26):normalizeInplace() * 250
-    local dir2 = (p26 - p27):normalizeInplace() * 250
+    local dir1 = (p27 - p26):normalizeInplace() * 550
+    local dir2 = (p26 - p27):normalizeInplace() * 550
     local line23 = copy{p26 + dir2, p27 + dir1}
 
     stageShot(line23, "line23")
@@ -434,8 +422,8 @@ function construct()
     stageShot(p29, "p29")
     stageShot(p30, "p30")
 
-    local dir_left = (p29 - p28):normalizeInplace() * 550
-    local dir_right = (p30 - p28):normalizeInplace() * 550
+    local dir_left = (p29 - p28):normalizeInplace() * 750
+    local dir_right = (p30 - p28):normalizeInplace() * 750
     local line24 = copy{p28, p28 + dir_left}
     local line25 = copy{p28, p28 + dir_right}
 
@@ -460,8 +448,8 @@ function construct()
 
     stageShot("(1,0,0)", p33, "p33")
 
-    local line26 = copy{p33, vector(p33.x - 200, p33.y)}
-    local line27 = copy{p33, vector(p33.x + 200, p33.y)}
+    local line26 = copy{p33, vector(p33.x - 1000, p33.y)}
+    local line27 = copy{p33, vector(p33.x + 1000, p33.y)}
 
     local p34 = intersection(line26[1], line26[2], line_tri6_left[1], line_tri6_left[2])
     local p35 = intersection(line27[1], line27[2], line_tri6_right[1], line_tri6_right[2])
@@ -483,10 +471,8 @@ function construct()
     stageShot(line_tri7_left, "line_tri7_left")
     stageShot(line_tri7_right, "line_tri7_right")
 
-    local p37 = intersection(line_tri7_left[1], line_tri7_left[2],
-        line_tri4_left[1], line_tri4_left[2])
-    local p38 = intersection(line_tri7_right[1], line_tri7_right[2],
-        line_tri4_right[1], line_tri4_right[2])
+    local p37 = intersection(line_tri7_left[1], line_tri7_left[2], line_tri4_left[1], line_tri4_left[2])
+    local p38 = intersection(line_tri7_right[1], line_tri7_right[2], line_tri4_right[1], line_tri4_right[2])
 
     stageShot(p37, "p37")
     stageShot(p38, "p38")
@@ -542,95 +528,12 @@ function construct()
         line_tri7_bottom, line_tri7_left, line_tri7_right,
         line_tri8_top, line_tri8_left, line_tri8_right, 
         line_tri9_top, line_tri9_left, line_tri9_right,
-    }
+    }, { cx, cy}
 end
-
-function drawPoint(point)
-    if point then
-        lg.circle("fill", point.x, point.y, 3)
-    end
-end
-
-function draw_lines(lines)
-    if lines then
-        for k, line in ipairs(lines) do
-            drawVecLine(line)
-        end
-    end
-end
-
-function drawDebug()
-    drawVecLine(vertLine)
-    -- горизонталь большого треугольника вершиной вниз
-    drawVecLine(line1) 
-    -- горизонталь большого треугольника вершиной вверх
-    drawVecLine(line2) 
-    -- правая сторона большого треугольника вершиной вниз
-    drawVecLine(line3) 
-    -- левая сторона большого треугольника вершиной вниз
-    drawVecLine(line4) 
-    -- левая сторона большого треугольника вершиной вверх
-    drawVecLine(line5) 
-    -- правая сторона большого треугольника вершиной вверх
-    drawVecLine(line6) 
-    -- первая вспомогательная линия до пересечения окружности справа снизу
-    drawVecLine(line7) 
-    -- первая вспомогательная линия до пересечения окружности слева снизу
-    drawVecLine(line8) 
-    -- горизонталь второгоо треугольника вершиной вверх
-    drawVecLine(line9) 
-    -- правая сторона второго треугольника вершиной вверх
-    drawVecLine(line10) 
-    -- левая сторона второго треугольника вершиной вверх
-    drawVecLine(line11) 
-    -- вспомогательная линия до пересечения с окружностью слева сверху
-    drawVecLine(line12) 
-    -- вторая вспомогательная линия до пересечения с окружностью справа сверху
-    drawVecLine(line13) 
-    -- горизонталь второго треугольника вершиной вниз
-    drawVecLine(line14) 
-
-    --lg.setColor{1, 0, 1}
-    -- левая сторон треугольника вершиной вверх, не обрезанная
-    drawVecLine(line15) 
-    -- правая сторона треугольника вершиной вверх, не обрезанная
-    drawVecLine(line16)
-    -- основание треугольника вершиной вверх, не обрезанное
-    drawVecLine(line17)  
-    drawVecLine(line18)  
-
-    --drawVecLine(line19)
-    --drawVecLine(line20)
-
-    -- правая строна треугольника с вершиной вниз
-    drawVecLine(line21)
-    -- левая сторона треугольника с вершиной вниз
-    drawVecLine(line22)
-
-    lg.setColor{0, 1, 0}
-    drawVecLine(line23)
-    
-    lg.setColor{1, 0, 1}
-
-    for i = 1, 27 do
-        local point = _G["p" .. i]
-        if point then drawPoint(point) end
-    end
-end
-
-local releaseMode = true
-local newMode = false
 
 function love.draw()
     local w, h = lg.getDimensions()
     bhupur.draw(w / 2, h / 2, h)
-
-    lg.setColor{0.13, 0.95, 0.1}
-    lg.circle("fill", cx, cy, 3)
-
-    lg.setColor{1, 1, 1}
-    -- нужно вычислить подходящий радиус окружности автоматически
-    lg.circle("line", cx, cy, circleRad)
 
     if visible then
         lg.setColor{1, 1, 1, 1}
@@ -642,7 +545,10 @@ function love.draw()
 end
 
 function drawSri2Canvas()
-    local lines = construct()
+    local lines, bindu = construct()
+    local cx, cy = bindu[1], bindu[2]
+    print("cx, cy", cx, cy)
+    --print("line", inspect(lines))
     lg.setCanvas(canvas)
     lg.clear()
     lg.setColor{1, 0, 0}
@@ -650,6 +556,14 @@ function drawSri2Canvas()
         --print("line", inspect(v))
         lg.line(v[1].x, v[1].y, v[2].x, v[2].y)
     end
+
+    lg.setColor{0.13, 0.95, 0.1}
+    lg.circle("fill", cx, cy, 3)
+
+    lg.setColor{1, 1, 1}
+    -- нужно вычислить подходящий радиус окружности автоматически
+    lg.circle("line", cx, cy, circleRad)
+
     lg.setCanvas()
     --canvas:newImageData():encode("png", "canva.png")
 end
@@ -669,7 +583,6 @@ end
 function resize(neww, newh)
     w, h = neww, newh
     circleRad = 0.4 * h
-    print("circleRad", circleRad)
     drawSri2Canvas()
 end
 
@@ -690,7 +603,5 @@ function love.keypressed(_, key)
     end
     if key == "escape" then
         love.event.quit()
-    elseif key == "q" then
-        drawSri2Canvas()
     end
 end
