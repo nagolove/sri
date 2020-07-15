@@ -458,6 +458,50 @@ function construct()
     stageShot("(0,1,0)", line_tri6_left, "line_tri6_left")
     stageShot("(0,1,0)", line_tri6_right, "line_tri6_right")
 
+    local p33 = line_tri4_right[2]
+
+    stageShot("(1,0,0)", p33, "p33")
+
+    local line26 = copy{p33, vector(p33.x - 200, p33.y)}
+    local line27 = copy{p33, vector(p33.x + 200, p33.y)}
+
+    local p34 = intersection(line26[1], line26[2], line_tri6_left[1], line_tri6_left[2])
+    local p35 = intersection(line27[1], line27[2], line_tri6_right[1], line_tri6_right[2])
+    local line_tri7_bottom = copy{p34, p35}
+
+    --stageShot(line26, "line26")
+    --stageShot(line27, "line27")
+
+    --stageShot(p34, "p34")
+    --stageShot(p35, "p35")
+    local p36 = intersection(vertLine[1], vertLine[2], line_tri6_top[1], line_tri6_top[2])
+    
+    --stageShot(line_tri7_bottom, "line_tri7_bottom")
+    --stageShot(p36, "p36")
+
+    local line_tri7_left = copy{p34, p36}
+    local line_tri7_right = copy{p35, p36}
+
+    stageShot(line_tri7_left, "line_tri7_left")
+    stageShot(line_tri7_right, "line_tri7_right")
+
+    local p37 = intersection(line_tri7_left[1], line_tri7_left[2],
+        line_tri4_left[1], line_tri4_left[2])
+    local p38 = intersection(line_tri7_right[1], line_tri7_right[2],
+        line_tri4_right[1], line_tri4_right[2])
+
+    stageShot(p37, "p37")
+    stageShot(p38, "p38")
+
+    local line_tri8_top = copy{p37, p38}
+    local p39 = intersection(vertLine[1], vertLine[2], line_tri5_bottom[1], line_tri5_bottom[2])
+    local line_tri8_left = copy{p37, p39}
+    local line_tri8_right = copy{p38, p39}
+
+    stageShot(line_tri8_top, "line_tri8_top")
+    stageShot(line_tri8_left, "line_tri8_left")
+    stageShot(line_tri8_right, "line_tri8_right")
+
     result = {
         line_tri1_top, 
         --line2, 
@@ -489,6 +533,14 @@ function construct()
         line_tri6_top,
         line_tri6_left,
         line_tri6_right,
+
+        line_tri7_bottom,
+        line_tri7_left,
+        line_tri7_right,
+
+        line_tri8_left,
+        line_tri8_right,
+        line_tri8_top,
     }
     return result
 end
