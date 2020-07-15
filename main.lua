@@ -250,8 +250,6 @@ function construct()
     end
     ------------------- END TESTING ONLY CODE -----------------
 
-    local result = {}
-
     local cx, cy = w / 2, h / 2
     local line_tri1_top, line_tri2_bottom = getBaseLines(cx, cy, baseLineParam)
 
@@ -283,8 +281,8 @@ function construct()
     stageShot(line_tri2_left)
     stageShot(line_tri2_right)
 
-    local rline1, rline2, rline3, rline4, rline5, rline6 = copy(line_tri1_top), copy(line2),
-        copy(line_tri1_left), copy(line_tri1_right), copy(line_tri2_left), copy(line_tri2_right)
+    --local rline1, rline2, rline3, rline4, rline5, rline6 = copy(line_tri1_top), copy(line2),
+        --copy(line_tri1_left), copy(line_tri1_right), copy(line_tri2_left), copy(line_tri2_right)
 
     local p5 = intersection(line_tri1_top[1], line_tri1_top[2], line_tri2_right[1], line_tri2_right[2])
     local p6 = intersection(line_tri1_top[1], line_tri1_top[2], line_tri2_left[1], line_tri2_left[2])
@@ -534,177 +532,17 @@ function construct()
 
     stageShot(line_tri9_left, line_tri9_right, line_tri9_top)
 
-    result = {
-        line_tri1_top, 
-        --line2, 
-        line_tri1_left, line_tri1_right,
-
-        line_tri2_left, line_tri2_right, line_tri2_bottom,
-        --line7, 
-        --line8, 
-        line_tri3_bottom, 
-        line_tri3_right,
-        line_tri3_left,
-        --line12, 
-        --line13, 
-        line_tri4_top, 
-
-        --line15, 
-        --line16, 
-        --line17, 
-
-        line_tri5_bottom, 
-        line_tri5_left, 
-        line_tri5_right, 
-
-        --line19, line20,
-        line_tri4_right, 
-        line_tri4_left, 
-        --line23,
-
-        line_tri6_top,
-        line_tri6_left,
-        line_tri6_right,
-
-        line_tri7_bottom,
-        line_tri7_left,
-        line_tri7_right,
-
-        line_tri8_left,
-        line_tri8_right,
-        line_tri8_top,
-
-        line_tri9_left,
-        line_tri9_right,
-        line_tri9_top,
+    return {
+        line_tri1_top, line_tri1_left, line_tri1_right,
+        line_tri2_bottom, line_tri2_left, line_tri2_right,
+        line_tri3_bottom, line_tri3_right, line_tri3_left,
+        line_tri4_top, line_tri4_right, line_tri4_left, 
+        line_tri5_bottom, line_tri5_left, line_tri5_right, 
+        line_tri6_top, line_tri6_left, line_tri6_right, 
+        line_tri7_bottom, line_tri7_left, line_tri7_right,
+        line_tri8_top, line_tri8_left, line_tri8_right, 
+        line_tri9_top, line_tri9_left, line_tri9_right,
     }
-    return result
-end
-
--- [[
--- Попробуй сделать класс sri, в котором будет метод calculate. Создай в нем
--- еще чистовой набор точек и чистовую функцию рисовки.
--- lineX - внутренняя линия, используется при построении
--- rlineX - линия для чистовой(release) рисовки
--- pX - внутренняя точка
--- rpX - чистовая точка
--- ]]
-function calculate()
-    cx, cy = w / 2, h / 2
-    --setupBaseLines(cx, cy, baseLineParam)
-    line1, line2 = getBaseLines(cx, cy, baseLineParam)
-
-    local circleCenter = vector(cx, cy)
-
-    vertLine = {vector(cx, cy - circleRad), vector(cx, cy + circleRad)}
-
-    p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy), 
-        circleRad)
-    p3, p4 = intersectionWithCircle(line2[1], line2[2], vector(cx, cy), 
-        circleRad)
-
-    line3 = copy{p1, vector(cx, cy + circleRad)}
-    line4 = copy{p2, vector(cx, cy + circleRad)}
-    line5 = copy{p3, vector(cx, cy - circleRad)}
-    line6 = copy{p4, vector(cx, cy - circleRad)}
-
-    rline1, rline2, rline3, rline4, rline5, rline6 = copy(line1), copy(line2),
-        copy(line3), copy(line4), copy(line5), copy(line6)
-
-    p5 = intersection(line1[1], line1[2], line6[1], line6[2])
-    p6 = intersection(line1[1], line1[2], line5[1], line5[2])
-
-    p7 = intersection(line2[1], line2[2], vertLine[1], vertLine[2])
-
-    local dir
-
-    -- 250 - конец отрезка должен выходить за окружность
-    dir = (p7 - p5):normalizeInplace() * circleRad
-    line7 = copy({p5, p7 + dir})
-
-    p8 = intersectionWithCircle(line7[1], line7[2], circleCenter, circleRad)
-
-    -- 250 - конец отрезка должен выходить за окружность
-    dir = (p7 - p6):normalizeInplace() * circleRad
-    line8 = copy({p6, p7 + dir})
-
-    p9 = intersectionWithCircle(line8[1], line8[2], circleCenter, circleRad)
-
-    p10 = intersection(line1[1], line1[2], vertLine[1], vertLine[2])
-
-    line9 = copy{p8, p9}
-
-    line10 = copy{p8, p10}
-    line11 = copy{p9, p10}
-
-    p11 = intersection(line10[1], line10[2], line3[1], line3[2]) -- правая
-    p12 = intersection(line11[1], line11[2], line4[1], line4[2]) -- левая
-
-    dir = (circleCenter - p11):normalizeInplace() * 440
-    line12 = copy{p11, p11 + dir} -- правая
-
-    dir = (circleCenter - p12):normalizeInplace() * 440
-    line13 = copy{p12, p12 + dir} -- левая
-
-    p13 = intersectionWithCircle(line12[1], line12[2], circleCenter, circleRad)
-    p14 = intersectionWithCircle(line13[1], line13[2], circleCenter, circleRad)
-    
-    -- горизонталь верхнего треугольника направленного вниз
-    line14 = copy{p13, p14} 
-
-    p15 = intersection(line14[1], line14[2], vertLine[1], vertLine[2])
-    
-    p16 = intersection(line4[1], line4[2], line2[1], line2[2])
-    p17 = intersection(line3[1], line3[2], line2[1], line2[2])
-
-    dir = (p16 - p15):normalizeInplace() * circleRad
-    line15 = copy{p15, p16 + dir}
-
-    dir = (p17 - p15):normalizeInplace() * circleRad
-    line16 = copy{p15, p17 + dir}
-
-    p18 = p11:clone()
-    p19 = p12:clone()
-    dir = (p19 - p18):normalizeInplace() * circleRad
-    p19 = p19 + dir
-    dir = (p18 - p19):normalizeInplace() * circleRad
-    p18 = p18 + dir
-
-    -- провести прямую через точки p18 и p19 взятых копией точек p11, p12
-    -- вспомогательная прямая, можно не рисовать
-    line17 = copy{p18, p19}
-
-    p20 = intersection(line17[1], line17[2], line16[1], line16[2])
-    p21 = intersection(line17[1], line17[2], line15[1], line15[2])
-
-    line18 = copy{p20, p21}
-
-    p22 = intersection(line15[1], line15[2], line1[1], line1[2])
-    p23 = intersection(line16[1], line16[2], line1[1], line1[2])
-
-    dir = (p22 - p13):normalizeInplace() * 600
-    -- вспомогательная линия
-    line19 = copy{p13, p13 + dir} -- правый отрезок
-
-    p24 = intersection(line19[1], line19[2], vertLine[1], vertLine[2])
-
-    dir = (p23 - p14):normalizeInplace() * 600
-    -- вспомогательная линия
-    line20 = copy{p14, p14 + dir} -- левый отрезок
-
-    p25 = intersection(line20[1], line20[2], vertLine[1], vertLine[2])
-
-    line21 = copy{p13, p24} -- правая
-    line22 = copy{p14, p25} -- левая
-
-    -- левая точка
-    p26 = intersection(line5[1], line5[2], line22[1], line22[2])
-    -- правая точка 
-    p27 = intersection(line6[1], line6[2], line21[1], line21[2])
-
-    local dir1 = (p27 - p26):normalizeInplace() * 150
-    local dir2 = (p26 - p27):normalizeInplace() * 150
-    line23 = copy{p26 + dir2, p27 + dir1}
 end
 
 function drawPoint(point)
@@ -780,16 +618,6 @@ function drawDebug()
     end
 end
 
-function draw()
-    lg.setColor{0, 0.7, 0}
-    for i = 1, 10 do
-        local line = _G["rline" .. i]
-        if line then
-            drawVecLine(line)
-        end
-    end
-end
-
 local releaseMode = true
 local newMode = false
 
@@ -804,16 +632,6 @@ function love.draw()
     -- нужно вычислить подходящий радиус окружности автоматически
     lg.circle("line", cx, cy, circleRad)
 
-    if new_mode then
-        draw_lines(lines)
-    else
-        if releaseMode then
-            draw()
-        else
-            drawDebug()
-        end
-    end
-
     if visible then
         lg.setColor{1, 1, 1, 1}
         lg.draw(canvas)
@@ -823,15 +641,28 @@ function love.draw()
     linesbuf:draw()
 end
 
+function drawSri2Canvas()
+    local lines = construct()
+    lg.setCanvas(canvas)
+    lg.clear()
+    lg.setColor{1, 0, 0}
+    for k, v in pairs(lines) do
+        --print("line", inspect(v))
+        lg.line(v[1].x, v[1].y, v[2].x, v[2].y)
+    end
+    lg.setCanvas()
+    --canvas:newImageData():encode("png", "canva.png")
+end
+
 function love.update(dt)
     linesbuf:update(dt)
     local kb = love.keyboard
     if kb.isDown("up") then
         baseLineParam = baseLineParam + 1
-        calculate()
+        drawSri2Canvas()
     elseif kb.isDown("down") then
         baseLineParam = baseLineParam - 1
-        calculate()
+        drawSri2Canvas()
     end
 end
 
@@ -839,7 +670,7 @@ function resize(neww, newh)
     w, h = neww, newh
     circleRad = 0.4 * h
     print("circleRad", circleRad)
-    calculate()
+    drawSri2Canvas()
 end
 
 function love.keypressed(_, key)
@@ -859,23 +690,7 @@ function love.keypressed(_, key)
     end
     if key == "escape" then
         love.event.quit()
-    elseif key == "r" then
-        releaseMode = not releaseMode
-    elseif key == "n" then
-        new_mode = not new_mode
     elseif key == "q" then
-        visible = not visible
-        if visible then
-            local lines = construct()
-            lg.setCanvas(canvas)
-            lg.clear()
-            lg.setColor{1, 0, 0}
-            for k, v in pairs(lines) do
-                --print("line", inspect(v))
-                lg.line(v[1].x, v[1].y, v[2].x, v[2].y)
-            end
-            lg.setCanvas()
-            canvas:newImageData():encode("png", "canva.png")
-        end
+        drawSri2Canvas()
     end
 end
