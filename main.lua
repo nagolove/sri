@@ -8,7 +8,6 @@ local vector = require "vector"
 local linesbuf = require "kons".new()
 local bhupur = require "bhupur"
 local lg = love.graphics
-local sri_lines
 local canvas = lg.newCanvas()
 local visible = false
 
@@ -199,20 +198,34 @@ end
 function construct()
     ------------------- TESTING ONLY CODE -----------------
     local testCanvas = lg.newCanvas()
-    local stageNum = 0
+    local stageNum = 1
     love.filesystem.createDirectory("stages")
+
+    for _, v in pairs(love.filesystem.getDirectoryItems("stages")) do
+        love.filesystem.remove("stages/" .. v)
+    end
 
     lg.setCanvas(testCanvas)
 
     function stageShot(...)
+        local prevPoint
         local args = {...}
         lg.setColor{0, 0, 1}
         for k, v in pairs(args) do
-            if v[1] and v[2] then
+            if type(v) == "string" then
+                lg.setColor{0, 0, 0}
+                if prevPoint then
+                    lg.print(v, prevPoint[1], prevPoint[2])
+                else
+                    lg.print(v)
+                end
+            elseif v[1] and v[2] then
                 lg.line(v[1].x, v[1].y, v[2].x, v[2].y)
+                prevPoint = { v[2].x, v[2].y }
             else -- point only
                 lg.setColor{0, 0, 0.7}
                 lg.circle("fill", v.x, v.y, 3)
+                prevPoint = { v.x, v.y }
             end
         end
         lg.setCanvas()
@@ -226,9 +239,12 @@ function construct()
     local result = {}
 
     local cx, cy = w / 2, h / 2
-    local line1, line2 = getBaseLines(cx, cy, baseLineParam)
+    local line_tri1_top, line_tri1_bottom = getBaseLines(cx, cy, baseLineParam)
 
-    stageShot(line1, line2)
+    lg.setColor{0, 0, 0}
+    lg.circle("line", cx, cy, circleRad)
+    stageShot(line_tri1_top)
+    stageShot(line_tri1_bottom)
 
     local circleCenter = vector(cx, cy)
 
@@ -238,26 +254,28 @@ function construct()
 
     stageShot(vertLine)
 
-    local p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy), circleRad)
-    local p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy), circleRad)
-    local p3, p4 = intersectionWithCircle(line2[1], line2[2], vector(cx, cy), circleRad)
+    local p1, p2 = intersectionWithCircle(line_tri1_top[1], line_tri1_top[2], vector(cx, cy), circleRad)
+    local p1, p2 = intersectionWithCircle(line_tri1_top[1], line_tri1_top[2], vector(cx, cy), circleRad)
+    local p3, p4 = intersectionWithCircle(line_tri1_bottom[1], line_tri1_bottom[2], vector(cx, cy), circleRad)
 
-    local line3 = copy{p1, vector(cx, cy + circleRad)}
-    local line4 = copy{p2, vector(cx, cy + circleRad)}
-    local line5 = copy{p3, vector(cx, cy - circleRad)}
-    local line6 = copy{p4, vector(cx, cy - circleRad)}
+    local line_tri1_left = copy{p1, vector(cx, cy + circleRad)}
+    local line_tri1_right = copy{p2, vector(cx, cy + circleRad)}
+    local line_tri2_left = copy{p3, vector(cx, cy - circleRad)}
+    local line_tri2_right = copy{p4, vector(cx, cy - circleRad)}
 
-    stageShot(line3) 
-    stageShot(line4)
-    stageShot(line5)
-    stageShot(line6)
+    stageShot(line_tri1_left) 
+    stageShot(line_tri1_right)
+    stageShot(line_tri2_left)
+    stageShot(line_tri2_right)
 
-    local rline1, rline2, rline3, rline4, rline5, rline6 = copy(line1), copy(line2),
-        copy(line3), copy(line4), copy(line5), copy(line6)
+    local rline1, rline2, rline3, rline4, rline5, rline6 = copy(line_tri1_top), copy(line2),
+        copy(line_tri1_left), copy(line_tri1_right), copy(line_tri2_left), copy(line_tri2_right)
 
-    local p5 = intersection(line1[1], line1[2], line6[1], line6[2])
-    local p6 = intersection(line1[1], line1[2], line5[1], line5[2])
-    local p7 = intersection(line2[1], line2[2], vertLine[1], vertLine[2])
+    local p5 = intersection(line_tri1_top[1], line_tri1_top[2], line_tri2_right[1], line_tri2_right[2])
+    local p6 = intersection(line_tri1_top[1], line_tri1_top[2], line_tri2_left[1], line_tri2_left[2])
+    local p7 = intersection(line_tri1_bottom[1], line_tri1_bottom[2], vertLine[1], vertLine[2])
+
+    stageShot(p5, p6, p7)
 
     local dir
 
@@ -265,43 +283,64 @@ function construct()
     dir = (p7 - p5):normalizeInplace() * circleRad
     local line7 = copy({p5, p7 + dir})
 
+    stageShot(line7, "line7") -- auxiliary_1
+
     local p8 = intersectionWithCircle(line7[1], line7[2], circleCenter, circleRad)
 
     -- 250 - конец отрезка должен выходить за окружность
     dir = (p7 - p6):normalizeInplace() * circleRad
     local line8 = copy({p6, p7 + dir})
 
+    stageShot(line8, "line8")
+
     local p9 = intersectionWithCircle(line8[1], line8[2], circleCenter, circleRad)
-    local p10 = intersection(line1[1], line1[2], vertLine[1], vertLine[2])
-    local line9 = copy{p8, p9}
+    local p10 = intersection(line_tri1_top[1], line_tri1_top[2], vertLine[1], vertLine[2])
+    local line_tri3_bottom = copy{p8, p9}
 
-    local line10 = copy{p8, p10}
-    local line11 = copy{p9, p10}
+    stageShot(line_tri3_bottom, "line_tri3_bottom")
 
-    local p11 = intersection(line10[1], line10[2], line3[1], line3[2]) -- правая
-    local p12 = intersection(line11[1], line11[2], line4[1], line4[2]) -- левая
+    local line_tri3_left = copy{p8, p10}
+    local line_tri3_right = copy{p9, p10}
+
+    stageShot(line_tri3_left)
+    stageShot(line_tri3_right)
+
+    local p11 = intersection(line_tri3_left[1], line_tri3_left[2], line_tri1_left[1], line_tri1_left[2]) -- правая
+    local p12 = intersection(line_tri3_right[1], line_tri3_right[2], line_tri1_right[1], line_tri1_right[2]) -- левая
 
     dir = (circleCenter - p11):normalizeInplace() * 440
     local line12 = copy{p11, p11 + dir} -- правая
 
+    --stageShot(line12)
+
     dir = (circleCenter - p12):normalizeInplace() * 440
     local line13 = copy{p12, p12 + dir} -- левая
+
+    --stageShot(line13)
 
     local p13 = intersectionWithCircle(line12[1], line12[2], circleCenter, circleRad)
     local p14 = intersectionWithCircle(line13[1], line13[2], circleCenter, circleRad)
 
-    -- горизонталь верхнего треугольника направленного вниз
-    local line14 = copy{p13, p14} 
+    stageShot(p13, p14)
 
-    local p15 = intersection(line14[1], line14[2], vertLine[1], vertLine[2])
-    local p16 = intersection(line4[1], line4[2], line2[1], line2[2])
-    local p17 = intersection(line3[1], line3[2], line2[1], line2[2])
+    -- горизонталь верхнего треугольника направленного вниз
+    local line_tri4_top = copy{p13, p14} 
+
+    stageShot(line_tri4_top, "line_tri4_top")
+
+    local p15 = intersection(line_tri4_top[1], line_tri4_top[2], vertLine[1], vertLine[2])
+    local p16 = intersection(line_tri1_right[1], line_tri1_right[2], line_tri1_bottom[1], line_tri1_bottom[2])
+    local p17 = intersection(line_tri1_left[1], line_tri1_left[2], line_tri1_bottom[1], line_tri1_bottom[2])
 
     dir = (p16 - p15):normalizeInplace() * circleRad
     local line15 = copy{p15, p16 + dir}
 
+    --stageShot(line15, "line15")
+
     dir = (p17 - p15):normalizeInplace() * circleRad
     local line16 = copy{p15, p17 + dir}
+
+    --stageShot(line16, "line16")
 
     local p18 = p11:clone()
     local p19 = p12:clone()
@@ -310,14 +349,24 @@ function construct()
     dir = (p18 - p19):normalizeInplace() * circleRad
     local p18 = p18 + dir
 
+    stageShot(p18)
+
     -- провести прямую через точки p18 и p19 взятых копией точек p11, p12
     -- вспомогательная прямая, можно не рисовать
     local line17 = copy{p18, p19}
 
+    --stageShot(line17, "line17")
+
     local p20 = intersection(line17[1], line17[2], line16[1], line16[2])
     local p21 = intersection(line17[1], line17[2], line15[1], line15[2])
 
-    local line18 = copy{p20, p21}
+    local line_tri5_bottom = copy{p20, p21}
+    local line_tri5_left = copy{ line16[1], line_tri5_bottom[1] }
+    local line_tri5_right = copy{ line16[1], line_tri5_bottom[2] }
+
+    stageShot(line_tri5_bottom, "line_tri5_bottom")
+    stageShot(line_tri5_left, "line_tri5_left")
+    stageShot(line_tri5_right, "line_tri5_right")
 
     local p22 = intersection(line15[1], line15[2], line1[1], line1[2])
     local p23 = intersection(line16[1], line16[2], line1[1], line1[2])
@@ -326,29 +375,48 @@ function construct()
     -- вспомогательная линия
     local line19 = copy{p13, p13 + dir} -- правый отрезок
 
+    stageShot(line19, "line19")
+
     local p24 = intersection(line19[1], line19[2], vertLine[1], vertLine[2])
 
     dir = (p23 - p14):normalizeInplace() * 600
     -- вспомогательная линия
     local line20 = copy{p14, p14 + dir} -- левый отрезок
 
+    stageShot(line20, "line20")
+
     local p25 = intersection(line20[1], line20[2], vertLine[1], vertLine[2])
 
     local line21 = copy{p13, p24} -- правая
     local line22 = copy{p14, p25} -- левая
 
+    stageShot(line21, "line21")
+    stageShot(line22, "line22")
+
     -- левая точка
-    local p26 = intersection(line5[1], line5[2], line22[1], line22[2])
+    local p26 = intersection(line_tri2_left[1], line_tri2_left[2], line22[1], line22[2])
     -- правая точка 
-    local p27 = intersection(line6[1], line6[2], line21[1], line21[2])
+    local p27 = intersection(line_tri2_right[1], line_tri2_right[2], line21[1], line21[2])
 
     local dir1 = (p27 - p26):normalizeInplace() * 150
     local dir2 = (p26 - p27):normalizeInplace() * 150
     line23 = copy{p26 + dir2, p27 + dir1}
 
+    stageShot(line23, "line23")
+
     result = {
-        line1, line2, line3, line4, line5, line6, line7, line8, line9, line11,
-        line12, line13, line14, line15, line16, line17, line18, line19, line20,
+        line_tri1_top, line2, line_tri1_left, line_tri1_right,
+        line_tri2_left, line_tri2_right, 
+        --line7, 
+        --line8, 
+        line_tri3_bottom, 
+        line_tri3_right,
+        --line12, 
+        --line13, 
+        line_tri4_top, 
+        line15, line16, line17, 
+        line_tri5_bottom, 
+        line19, line20,
         line21, line22, line23,
     }
     return result
