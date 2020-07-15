@@ -9,6 +9,8 @@ local linesbuf = require "kons".new()
 local bhupur = require "bhupur"
 local lg = love.graphics
 local sri_lines
+local canvas = lg.newCanvas()
+local visible = false
 
 -- Возвращает истину если точка с координатами px и py находится в круге 
 -- радиуса cr и координатами cx и cy
@@ -205,6 +207,115 @@ function construct()
     local p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy),
         circleRad)
 
+    local p1, p2 = intersectionWithCircle(line1[1], line1[2], vector(cx, cy), 
+    circleRad)
+    local p3, p4 = intersectionWithCircle(line2[1], line2[2], vector(cx, cy), 
+    circleRad)
+
+    local line3 = copy{p1, vector(cx, cy + circleRad)}
+    local line4 = copy{p2, vector(cx, cy + circleRad)}
+    local line5 = copy{p3, vector(cx, cy - circleRad)}
+    local line6 = copy{p4, vector(cx, cy - circleRad)}
+
+    local rline1, rline2, rline3, rline4, rline5, rline6 = copy(line1), copy(line2),
+    copy(line3), copy(line4), copy(line5), copy(line6)
+
+    local p5 = intersection(line1[1], line1[2], line6[1], line6[2])
+    local p6 = intersection(line1[1], line1[2], line5[1], line5[2])
+    local p7 = intersection(line2[1], line2[2], vertLine[1], vertLine[2])
+
+    local dir
+
+    -- 250 - конец отрезка должен выходить за окружность
+    dir = (p7 - p5):normalizeInplace() * circleRad
+    local line7 = copy({p5, p7 + dir})
+
+    local p8 = intersectionWithCircle(line7[1], line7[2], circleCenter, circleRad)
+
+    -- 250 - конец отрезка должен выходить за окружность
+    dir = (p7 - p6):normalizeInplace() * circleRad
+    local line8 = copy({p6, p7 + dir})
+
+    local p9 = intersectionWithCircle(line8[1], line8[2], circleCenter, circleRad)
+    local p10 = intersection(line1[1], line1[2], vertLine[1], vertLine[2])
+    local line9 = copy{p8, p9}
+
+    local line10 = copy{p8, p10}
+    local line11 = copy{p9, p10}
+
+    local p11 = intersection(line10[1], line10[2], line3[1], line3[2]) -- правая
+    local p12 = intersection(line11[1], line11[2], line4[1], line4[2]) -- левая
+
+    dir = (circleCenter - p11):normalizeInplace() * 440
+    local line12 = copy{p11, p11 + dir} -- правая
+
+    dir = (circleCenter - p12):normalizeInplace() * 440
+    local line13 = copy{p12, p12 + dir} -- левая
+
+    local p13 = intersectionWithCircle(line12[1], line12[2], circleCenter, circleRad)
+    local p14 = intersectionWithCircle(line13[1], line13[2], circleCenter, circleRad)
+
+    -- горизонталь верхнего треугольника направленного вниз
+    local line14 = copy{p13, p14} 
+
+    local p15 = intersection(line14[1], line14[2], vertLine[1], vertLine[2])
+    local p16 = intersection(line4[1], line4[2], line2[1], line2[2])
+    local p17 = intersection(line3[1], line3[2], line2[1], line2[2])
+
+    dir = (p16 - p15):normalizeInplace() * circleRad
+    local line15 = copy{p15, p16 + dir}
+
+    dir = (p17 - p15):normalizeInplace() * circleRad
+    local line16 = copy{p15, p17 + dir}
+
+    local p18 = p11:clone()
+    local p19 = p12:clone()
+    dir = (p19 - p18):normalizeInplace() * circleRad
+    local p19 = p19 + dir
+    dir = (p18 - p19):normalizeInplace() * circleRad
+    local p18 = p18 + dir
+
+    -- провести прямую через точки p18 и p19 взятых копией точек p11, p12
+    -- вспомогательная прямая, можно не рисовать
+    local line17 = copy{p18, p19}
+
+    local p20 = intersection(line17[1], line17[2], line16[1], line16[2])
+    local p21 = intersection(line17[1], line17[2], line15[1], line15[2])
+
+    local line18 = copy{p20, p21}
+
+    local p22 = intersection(line15[1], line15[2], line1[1], line1[2])
+    local p23 = intersection(line16[1], line16[2], line1[1], line1[2])
+
+    dir = (p22 - p13):normalizeInplace() * 600
+    -- вспомогательная линия
+    local line19 = copy{p13, p13 + dir} -- правый отрезок
+
+    local p24 = intersection(line19[1], line19[2], vertLine[1], vertLine[2])
+
+    dir = (p23 - p14):normalizeInplace() * 600
+    -- вспомогательная линия
+    local line20 = copy{p14, p14 + dir} -- левый отрезок
+
+    local p25 = intersection(line20[1], line20[2], vertLine[1], vertLine[2])
+
+    local line21 = copy{p13, p24} -- правая
+    local line22 = copy{p14, p25} -- левая
+
+    -- левая точка
+    local p26 = intersection(line5[1], line5[2], line22[1], line22[2])
+    -- правая точка 
+    local p27 = intersection(line6[1], line6[2], line21[1], line21[2])
+
+    local dir1 = (p27 - p26):normalizeInplace() * 150
+    local dir2 = (p26 - p27):normalizeInplace() * 150
+    line23 = copy{p26 + dir2, p27 + dir1}
+
+    result = {
+        line1, line2, line3, line4, line5, line6, line7, line8, line9, line11,
+        line12, line13, line14, line15, line16, line17, line18, line19, line20,
+        line21, line22, line23,
+    }
     return result
 end
 
@@ -441,6 +552,11 @@ function love.draw()
         end
     end
 
+    if visible then
+        lg.setColor{1, 1, 1, 1}
+        lg.draw(canvas)
+    end
+
     linesbuf:pushi("baseLineParam = %d", baseLineParam)
     linesbuf:draw()
 end
@@ -485,5 +601,19 @@ function love.keypressed(_, key)
         releaseMode = not releaseMode
     elseif key == "n" then
         new_mode = not new_mode
+    elseif key == "q" then
+        visible = not visible
+        if visible then
+            local lines = construct()
+            lg.setCanvas(canvas)
+            lg.clear()
+            lg.setColor{1, 0, 0}
+            for k, v in pairs(lines) do
+                print("line", inspect(v))
+                lg.line(v[1].x, v[1].y, v[2].x, v[2].y)
+            end
+            lg.setCanvas()
+            canvas:newImageData():encode("png", "canva.png")
+        end
     end
 end
