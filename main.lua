@@ -349,7 +349,7 @@ function construct()
     dir = (p18 - p19):normalizeInplace() * circleRad
     local p18 = p18 + dir
 
-    stageShot(p18)
+    --stageShot(p18)
 
     -- провести прямую через точки p18 и p19 взятых копией точек p11, p12
     -- вспомогательная прямая, можно не рисовать
@@ -411,13 +411,21 @@ function construct()
         --line8, 
         line_tri3_bottom, 
         line_tri3_right,
+        line_tri3_left,
         --line12, 
         --line13, 
         line_tri4_top, 
-        line15, line16, line17, 
+
+        --line15, 
+        --line16, 
+        --line17, 
+
         line_tri5_bottom, 
-        line19, line20,
-        line21, line22, line23,
+        line_tri5_left, 
+        line_tri5_right, 
+
+        --line19, line20,
+        --line21, line22, line23,
     }
     return result
 end
