@@ -502,6 +502,38 @@ function construct()
     stageShot(line_tri8_left, "line_tri8_left")
     stageShot(line_tri8_right, "line_tri8_right")
 
+    local p40 = intersection(line_tri3_left[1], line_tri3_left[2],
+        line_tri4_left[1], line_tri4_left[2])
+    local p41 = intersection(line_tri3_right[1], line_tri3_right[2],
+        line_tri4_right[1], line_tri4_right[2])
+
+    stageShot(p40, "p40")
+    stageShot(p41, "p41")
+
+    local dir1 = (p40 - p41):normalizeInplace() * 300
+    local dir2 = (p41 - p40):normalizeInplace() * 300
+    local line28 = copy{p40, p40 + dir1}
+    local line29 = copy{p41, p41 + dir2}
+
+    local p42 = intersection(line28[1], line28[2], line_tri7_left[1], line_tri7_right[2])
+    local p43 = intersection(line29[1], line29[2], line_tri7_right[1], line_tri7_right[2])
+
+    stageShot(line28, "line28")
+    stageShot(line29, "line29")
+
+    stageShot(p42, "p42")
+    stageShot(p43, "p43")
+
+    local p44 = intersection(vertLine[1], vertLine[2], line_tri2_bottom[1], line_tri2_bottom[2])
+
+    stageShot(p44, "p44")
+
+    local line_tri9_left = copy{p42, p44}
+    local line_tri9_right = copy{p43, p44}
+    local line_tri9_top = copy{p42, p43}
+
+    stageShot(line_tri9_left, line_tri9_right, line_tri9_top)
+
     result = {
         line_tri1_top, 
         --line2, 
@@ -541,6 +573,10 @@ function construct()
         line_tri8_left,
         line_tri8_right,
         line_tri8_top,
+
+        line_tri9_left,
+        line_tri9_right,
+        line_tri9_top,
     }
     return result
 end
