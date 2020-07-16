@@ -47,7 +47,9 @@ function draw4avarana()
     print("triangles", inspect(triangles))
     lg.setCanvas(canvas)
     lg.setColor{0.8, 0, 0}
-    lg.polygon("fill", triangles)
+    for _, v in pairs(triangles) do
+        lg.polygon("fill", v)
+    end
     lg.setCanvas()
 end
 

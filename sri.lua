@@ -482,16 +482,18 @@ end
 
 -- see avarana4.jpg for numerating scheme
 function get4avarana(lines)
-    local vertices = {}
+    local triangles = {}
     local p1, p2, p3
 
     function addTriangle(p1, p2, p3)
-        table.insert(vertices, p1.x)
-        table.insert(vertices, p1.y)
-        table.insert(vertices, p2.x)
-        table.insert(vertices, p2.y)
-        table.insert(vertices, p3.x)
-        table.insert(vertices, p3.y)
+        local tri = {}
+        table.insert(tri, p1.x)
+        table.insert(tri, p1.y)
+        table.insert(tri, p2.x)
+        table.insert(tri, p2.y)
+        table.insert(tri, p3.x)
+        table.insert(tri, p3.y)
+        table.insert(triangles, tri)
     end
 
     p1 = intersection2(lines[2][2], lines[1][2])
@@ -499,66 +501,58 @@ function get4avarana(lines)
     p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
     addTriangle(p1, p2, p3)
 
-    p1, p2, p3 = nil, nil, nil
-    p1 = intersection2(lines[5][2], lines[1][2])
-    p2 = intersection2(lines[5][1], lines[1][2])
+    p1 = intersection2(lines[1][2], lines[5][2])
+    p2 = intersection2(lines[1][2], lines[5][1])
     p3 = vector(lines[5][1][1].x, lines[5][1][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[3][2], lines[1][2])
+    p2 = intersection2(lines[3][1], lines[1][2])
+    p3 = vector(lines[3][1][1].x, lines[3][1][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[3][1], lines[1][2])
+    p2 = intersection2(lines[3][1], lines[1][3])
+    p3 = vector(lines[1][2][2].x, lines[1][2][2].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[1][3], lines[3][1])
+    p2 = intersection2(lines[1][3], lines[3][3])
+    p3 = vector(lines[3][1][2].x, lines[3][1][2].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[1][3], lines[5][1])
+    p2 = intersection2(lines[1][3], lines[5][3])
+    p3 = vector(lines[5][1][2].x, lines[5][1][2].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[1][3], lines[2][1])
+    p2 = intersection2(lines[1][3], lines[2][3])
+    p3 = vector(lines[2][1][1].x, lines[2][1][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[2][3], lines[1][1])
+    p2 = intersection2(lines[2][3], lines[1][3])
+    p3 = vector(lines[1][1][1].x, lines[1][1][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[2][3], lines[6][1])
+    p2 = intersection2(lines[2][3], lines[6][3])
+    p3 = vector(lines[6][1][2].x, lines[6][1][2].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[2][3], lines[4][1])
+    p2 = intersection2(lines[2][3], lines[4][3])
+    p3 = vector(lines[4][1][1].x, lines[4][1][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[2][2], lines[4][1])
+    p2 = intersection2(lines[2][3], lines[4][1])
+    p3 = vector(lines[2][2][2].x, lines[2][2][2].y)
     print(p1, p2, p3)
-    --stageShot(p1, "p1")
-    --stageShot(p2, "p2")
-    --stageShot(p3, "p3")
-    stageShot(lines[1][1])
-    stageShot(lines[1][2])
-    stageShot(lines[1][3])
-    stageShot(lines[5][2])
     addTriangle(p1, p2, p3)
 
-    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
-    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
-    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
-    addTriangle(p1, p2, p3)
-
-    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
-    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
-    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
-    addTriangle(p1, p2, p3)
-
-    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
-    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
-    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
-    addTriangle(p1, p2, p3)
-
-    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
-    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
-    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
-    addTriangle(p1, p2, p3)
-
-    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
-    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
-    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
-    addTriangle(p1, p2, p3)
-
-    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
-    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
-    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
-    addTriangle(p1, p2, p3)
-
-    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
-    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
-    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
-    addTriangle(p1, p2, p3)
-
-    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
-    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
-    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
-    addTriangle(p1, p2, p3)
-
-    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
-    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
-    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
-    addTriangle(p1, p2, p3)
-
-    return vertices
+    return triangles
 end
 
 return {
