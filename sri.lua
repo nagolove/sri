@@ -549,7 +549,21 @@ function get4avarana(lines)
     p1 = intersection2(lines[2][2], lines[4][1])
     p2 = intersection2(lines[2][3], lines[4][1])
     p3 = vector(lines[2][2][2].x, lines[2][2][2].y)
-    print(p1, p2, p3)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[2][2], lines[4][1])
+    p2 = intersection2(lines[2][2], lines[4][2])
+    p3 = vector(lines[4][2][1].x, lines[4][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[2][2], lines[6][1])
+    p2 = intersection2(lines[2][2], lines[6][2])
+    p3 = vector(lines[6][1][1].x, lines[6][1][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[2][2], lines[1][1])
+    p2 = intersection2(lines[2][2], lines[1][2])
+    p3 = vector(lines[1][1][2].x, lines[1][1][2].y)
     addTriangle(p1, p2, p3)
 
     return triangles
