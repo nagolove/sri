@@ -23,6 +23,7 @@ local vertLine
 
 function love.load()
     resize(w, h)
+    draw4avarana()
 end
 
 function love.draw()
@@ -43,11 +44,10 @@ function draw4avarana()
         drawSri2Canvas()
     end
     local triangles = sri.get4avarana(lines)
+    print("triangles", inspect(triangles))
     lg.setCanvas(canvas)
-    for k, v in pairs(triangles) do
-        lg.setColor{0.8, 0, 0}
-        lg.polygon("fill", v)
-    end
+    lg.setColor{0.8, 0, 0}
+    lg.polygon("fill", triangles)
     lg.setCanvas()
 end
 

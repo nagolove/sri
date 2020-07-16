@@ -1,4 +1,8 @@
+__DEBUG__ = true
+
 local vector = require "vector"
+local isvector = vector.isvector
+local inspect = require "inspect"
 
 function copy(tbl)
     local result = {}
@@ -47,6 +51,10 @@ function intersection(start1, end1, start2, end2)
     local u = seg1_line2_start / (seg1_line2_start - seg1_line2_end);
 
     return start1 + u*dir1;
+end
+
+function intersection2(line1, line2)
+    return intersection(line1[1], line1[2], line2[1], line2[2])
 end
 
 -- возвращает два или одно значение точек пересечения в виде векторов или nil
@@ -112,21 +120,21 @@ function getBaseLines(cx, cy, d, circleRad)
 end
 
 
-local __DEBUG__ = false
-
 if __DEBUG__ then
-    local testCanvas = lg.newCanvas()
-    local stageNum = 1
+    testCanvas = love.graphics.newCanvas()
+    stageNum = 1
+
     love.filesystem.createDirectory("stages")
 
     for _, v in pairs(love.filesystem.getDirectoryItems("stages")) do
         love.filesystem.remove("stages/" .. v)
     end
 
-    lg.setCanvas(testCanvas)
+    love.graphics.setCanvas(testCanvas)
 end
 
 function stageShot(...)
+    local lg = love.graphics
     local prevPoint
     local args = {...}
     local r, g, b
@@ -173,6 +181,9 @@ if not __DEBUG__ then
 end
 
 function construct(cx, cy, baseLineParam, circleRad)
+    local __stageShot = stageShot
+    stageShot = function() end
+
     --local cx, cy = w / 2, h / 2
     baseLineParam = math.ceil(baseLineParam)
     print("construct", cx, cy, baseLineParam, circleRad)
@@ -454,23 +465,100 @@ function construct(cx, cy, baseLineParam, circleRad)
 
     stageShot(line_tri9_left, line_tri9_right, line_tri9_top)
 
+    stageShot = __stageShot
+
     return {
-        { line_tri1_top, line_tri1_left, line_tri1_right },
+        { line_tri1_top,    line_tri1_left, line_tri1_right },
         { line_tri2_bottom, line_tri2_left, line_tri2_right },
-        { line_tri3_bottom, line_tri3_right, line_tri3_left },
-        { line_tri4_top, line_tri4_right, line_tri4_left, },
+        { line_tri3_bottom, line_tri3_left, line_tri3_right },
+        { line_tri4_top,    line_tri4_left, line_tri4_right, },
         { line_tri5_bottom, line_tri5_left, line_tri5_right, },
-        { line_tri6_top, line_tri6_left, line_tri6_right, },
+        { line_tri6_top,    line_tri6_left, line_tri6_right, },
         { line_tri7_bottom, line_tri7_left, line_tri7_right },
-        { line_tri8_top, line_tri8_left, line_tri8_right, },
-        { line_tri9_top, line_tri9_left, line_tri9_right },
+        { line_tri8_top,    line_tri8_left, line_tri8_right, },
+        { line_tri9_top,    line_tri9_left, line_tri9_right },
     }
 end
 
+-- see avarana4.jpg for numerating scheme
 function get4avarana(lines)
-    local p1, p2
-    local tri1 = {}
-    --p1 = intersection(lines[2
+    local vertices = {}
+    local p1, p2, p3
+
+    function addTriangle(p1, p2, p3)
+        table.insert(vertices, p1.x)
+        table.insert(vertices, p1.y)
+        table.insert(vertices, p2.x)
+        table.insert(vertices, p2.y)
+        table.insert(vertices, p3.x)
+        table.insert(vertices, p3.y)
+    end
+
+    p1 = intersection2(lines[2][2], lines[1][2])
+    p2 = intersection2(lines[2][1], lines[1][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1, p2, p3 = nil, nil, nil
+    p1 = intersection2(lines[5][2], lines[1][2])
+    p2 = intersection2(lines[5][1], lines[1][2])
+    p3 = vector(lines[5][1][1].x, lines[5][1][1].y)
+    print(p1, p2, p3)
+    --stageShot(p1, "p1")
+    --stageShot(p2, "p2")
+    --stageShot(p3, "p3")
+    stageShot(lines[1][1])
+    stageShot(lines[1][2])
+    stageShot(lines[1][3])
+    stageShot(lines[5][2])
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
+    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
+    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
+    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
+    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
+    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
+    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
+    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
+    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection(lines[2][2][1], lines[2][2][2], lines[1][2][1], lines[1][2][2])
+    p2 = intersection(lines[2][1][1], lines[2][1][2], lines[1][2][1], lines[1][2][2])
+    p3 = vector(lines[2][2][1].x, lines[2][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    return vertices
 end
 
 return {
