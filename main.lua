@@ -32,7 +32,7 @@ function love.draw()
         lg.draw(canvas)
     end
 
-    linesbuf:pushi("baseLineParam = %d", baseLineParam)
+    --linesbuf:pushi("baseLineParam = %d", baseLineParam)
     linesbuf:draw()
 end
 
@@ -75,6 +75,7 @@ end
 
 function resize(neww, newh)
     w, h = neww, newh
+    canvas = lg.newCanvas(w, h)
     drawSri2Canvas()
 end
 
