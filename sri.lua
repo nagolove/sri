@@ -589,6 +589,51 @@ function get5avarana(lines)
     p3 = intersection2(lines[6][2], lines[2][1])
     addTriangle(p1, p2, p3)
 
+    p1 = intersection2(lines[5][1], lines[3][2])
+    p2 = intersection2(lines[3][2], lines[6][2])
+    p3 = intersection2(lines[6][2], lines[5][1])
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[5][1], lines[6][2])
+    p2 = intersection2(lines[5][1], lines[6][3])
+    p3 = vector(lines[6][2][1].x, lines[6][2][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[5][1], lines[6][3])
+    p2 = intersection2(lines[5][1], lines[3][3])
+    p3 = intersection2(lines[3][3], lines[6][3])
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[2][1], lines[1][3])
+    p2 = intersection2(lines[2][1], lines[3][3])
+    p3 = intersection2(lines[5][3], lines[6][3])
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[1][1], lines[5][3])
+    p2 = intersection2(lines[1][1], lines[6][3])
+    p3 = intersection2(lines[5][3], lines[6][3])
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[5][3], lines[6][1])
+    p2 = intersection2(lines[6][1], lines[4][3])
+    p3 = intersection2(lines[5][3], lines[4][3])
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[6][1], lines[5][2])
+    p2 = intersection2(lines[6][1], lines[5][3])
+    p3 = vector(lines[5][3][1].x, lines[5][3][1].y)
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[6][1], lines[4][2])
+    p2 = intersection2(lines[6][1], lines[5][2])
+    p3 = intersection2(lines[1][1], lines[5][2])
+    addTriangle(p1, p2, p3)
+
+    p1 = intersection2(lines[1][1], lines[6][2])
+    p2 = intersection2(lines[1][1], lines[4][2])
+    p3 = intersection2(lines[6][2], lines[5][2])
+    addTriangle(p1, p2, p3)
+
     return triangles
 end
 
