@@ -23,8 +23,7 @@ local vertLine
 
 function love.load()
     resize(w, h)
-    --draw4avarana()
-    draw5avarana()
+    drawAvarana(5)
 end
 
 function love.draw()
@@ -38,31 +37,21 @@ function love.draw()
     linesbuf:draw()
 end
 
-function draw5avarana()
-    if not lines then
-        drawSri2Canvas()
+function drawAvarana(num)
+    if num == 4 or num == 5 then
+        if not lines then
+            drawSri2Canvas()
+        end
+        local funcName = "get" .. num .. "avarana"
+        print(funcName)
+        local triangles = sri[funcName](lines)
+        lg.setCanvas(canvas)
+        lg.setColor{0.8, 0, 0}
+        for _, v in pairs(triangles) do
+            lg.polygon("fill", v)
+        end
+        lg.setCanvas()
     end
-    local triangles = sri.get5avarana(lines)
-    print("triangles", inspect(triangles))
-    lg.setCanvas(canvas)
-    lg.setColor{0.8, 0, 0}
-    for _, v in pairs(triangles) do
-        lg.polygon("fill", v)
-    end
-    lg.setCanvas()
-end
-
-function draw4avarana()
-    if not lines then
-        drawSri2Canvas()
-    end
-    local triangles = sri.get4avarana(lines)
-    lg.setCanvas(canvas)
-    lg.setColor{0.8, 0, 0}
-    for _, v in pairs(triangles) do
-        lg.polygon("fill", v)
-    end
-    lg.setCanvas()
 end
 
 function drawSri2Canvas()
@@ -133,8 +122,8 @@ function love.keypressed(_, key)
     if key == "escape" then
         love.event.quit()
     elseif key == "4" then
-        draw4avarana()
+        drawAvarana(4)
     elseif key == "5" then
-        draw5avarana()
+        drawAvarana(5)
     end
 end
