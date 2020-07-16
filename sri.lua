@@ -569,7 +569,31 @@ function get4avarana(lines)
     return triangles
 end
 
+function get5avarana(lines)
+    local triangles = {}
+    local p1, p2, p3
+
+    function addTriangle(p1, p2, p3)
+        local tri = {}
+        table.insert(tri, p1.x)
+        table.insert(tri, p1.y)
+        table.insert(tri, p2.x)
+        table.insert(tri, p2.y)
+        table.insert(tri, p3.x)
+        table.insert(tri, p3.y)
+        table.insert(triangles, tri)
+    end
+
+    p1 = intersection2(lines[5][2], lines[2][1])
+    p2 = intersection2(lines[5][2], lines[6][2])
+    p3 = intersection2(lines[6][2], lines[2][1])
+    addTriangle(p1, p2, p3)
+
+    return triangles
+end
+
 return {
     construct = construct,
     get4avarana = get4avarana,
+    get5avarana = get5avarana,
 }

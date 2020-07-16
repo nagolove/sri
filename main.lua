@@ -23,12 +23,11 @@ local vertLine
 
 function love.load()
     resize(w, h)
-    draw4avarana()
+    --draw4avarana()
+    draw5avarana()
 end
 
 function love.draw()
-    local w, h = lg.getDimensions()
-    bhupur.draw(w / 2, h / 2, h)
 
     if visible then
         lg.setColor{1, 1, 1, 1}
@@ -39,12 +38,25 @@ function love.draw()
     linesbuf:draw()
 end
 
+function draw5avarana()
+    if not lines then
+        drawSri2Canvas()
+    end
+    local triangles = sri.get5avarana(lines)
+    print("triangles", inspect(triangles))
+    lg.setCanvas(canvas)
+    lg.setColor{0.8, 0, 0}
+    for _, v in pairs(triangles) do
+        lg.polygon("fill", v)
+    end
+    lg.setCanvas()
+end
+
 function draw4avarana()
     if not lines then
         drawSri2Canvas()
     end
     local triangles = sri.get4avarana(lines)
-    print("triangles", inspect(triangles))
     lg.setCanvas(canvas)
     lg.setColor{0.8, 0, 0}
     for _, v in pairs(triangles) do
@@ -63,6 +75,9 @@ function drawSri2Canvas()
     --print("line", inspect(lines))
     lg.setCanvas(canvas)
     lg.clear()
+
+    bhupur.draw(w / 2, h / 2, h)
+
     lg.setColor{1, 0, 0}
     for _, v in pairs(lines) do
         for _, l in pairs(v) do
@@ -119,5 +134,7 @@ function love.keypressed(_, key)
         love.event.quit()
     elseif key == "4" then
         draw4avarana()
+    elseif key == "5" then
+        draw5avarana()
     end
 end
