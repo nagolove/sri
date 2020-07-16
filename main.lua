@@ -9,13 +9,15 @@ local bhupur = require "bhupur"
 local lg = love.graphics
 local canvas = lg.newCanvas()
 local visible = true
-local construct = require "sri".construct
+local sri = require "sri"
+local tween = require "tween"
+local lines
 
 local w, h = lg.getDimensions()
 
 -- центр построения
 local cx, cy
-local baseLineParam = 60
+local baseLineParam = 0.1
 local circleRad
 local vertLine
 
@@ -36,18 +38,35 @@ function love.draw()
     linesbuf:draw()
 end
 
+function draw4avarana()
+    if not lines then
+        drawSri2Canvas()
+    end
+    local triangles = sri.get4avarana(lines)
+    lg.setCanvas(canvas)
+    for k, v in pairs(triangles) do
+        lg.setColor{0.8, 0, 0}
+        lg.polygon("fill", v)
+    end
+    lg.setCanvas()
+end
+
 function drawSri2Canvas()
     local cx, cy = w / 2, h / 2
     local circleRad = 0.4 * h
-    local lines = construct(cx, cy, baseLineParam, circleRad)
+    lines = sri.construct(cx, cy, baseLineParam * h, circleRad)
+    --print("param", baseLineParam * h)
+    --local lines = construct(cx, cy, baseLineParam, circleRad)
     print("cx, cy", cx, cy)
     --print("line", inspect(lines))
     lg.setCanvas(canvas)
     lg.clear()
     lg.setColor{1, 0, 0}
-    for k, v in pairs(lines) do
-        --print("line", inspect(v))
-        lg.line(v[1].x, v[1].y, v[2].x, v[2].y)
+    for _, v in pairs(lines) do
+        for _, l in pairs(v) do
+            --print("line", inspect(v))
+            lg.line(l[1].x, l[1].y, l[2].x, l[2].y)
+        end
     end
 
     lg.setColor{0.13, 0.95, 0.1}
@@ -65,10 +84,10 @@ function love.update(dt)
     linesbuf:update(dt)
     local kb = love.keyboard
     if kb.isDown("up") then
-        baseLineParam = baseLineParam + 1
+        baseLineParam = baseLineParam + 0.1
         drawSri2Canvas()
     elseif kb.isDown("down") then
-        baseLineParam = baseLineParam - 1
+        baseLineParam = baseLineParam - 0.1
         drawSri2Canvas()
     end
 end
@@ -96,5 +115,7 @@ function love.keypressed(_, key)
     end
     if key == "escape" then
         love.event.quit()
+    elseif key == "4" then
+        draw4avarana()
     end
 end

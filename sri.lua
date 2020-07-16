@@ -174,6 +174,7 @@ end
 
 function construct(cx, cy, baseLineParam, circleRad)
     --local cx, cy = w / 2, h / 2
+    baseLineParam = math.ceil(baseLineParam)
     print("construct", cx, cy, baseLineParam, circleRad)
     local line_tri1_top, line_tri2_bottom = getBaseLines(cx, cy, baseLineParam, circleRad)
 
@@ -191,7 +192,6 @@ function construct(cx, cy, baseLineParam, circleRad)
 
     stageShot(vertLine)
 
-    local p1, p2 = intersectionWithCircle(line_tri1_top[1], line_tri1_top[2], vector(cx, cy), circleRad)
     local p1, p2 = intersectionWithCircle(line_tri1_top[1], line_tri1_top[2], vector(cx, cy), circleRad)
     local p3, p4 = intersectionWithCircle(line_tri2_bottom[1], line_tri2_bottom[2], vector(cx, cy), circleRad)
 
@@ -455,18 +455,25 @@ function construct(cx, cy, baseLineParam, circleRad)
     stageShot(line_tri9_left, line_tri9_right, line_tri9_top)
 
     return {
-        line_tri1_top, line_tri1_left, line_tri1_right,
-        line_tri2_bottom, line_tri2_left, line_tri2_right,
-        line_tri3_bottom, line_tri3_right, line_tri3_left,
-        line_tri4_top, line_tri4_right, line_tri4_left, 
-        line_tri5_bottom, line_tri5_left, line_tri5_right, 
-        line_tri6_top, line_tri6_left, line_tri6_right, 
-        line_tri7_bottom, line_tri7_left, line_tri7_right,
-        line_tri8_top, line_tri8_left, line_tri8_right, 
-        line_tri9_top, line_tri9_left, line_tri9_right,
+        { line_tri1_top, line_tri1_left, line_tri1_right },
+        { line_tri2_bottom, line_tri2_left, line_tri2_right },
+        { line_tri3_bottom, line_tri3_right, line_tri3_left },
+        { line_tri4_top, line_tri4_right, line_tri4_left, },
+        { line_tri5_bottom, line_tri5_left, line_tri5_right, },
+        { line_tri6_top, line_tri6_left, line_tri6_right, },
+        { line_tri7_bottom, line_tri7_left, line_tri7_right },
+        { line_tri8_top, line_tri8_left, line_tri8_right, },
+        { line_tri9_top, line_tri9_left, line_tri9_right },
     }
+end
+
+function get4avarana(lines)
+    local p1, p2
+    local tri1 = {}
+    --p1 = intersection(lines[2
 end
 
 return {
     construct = construct,
+    get4avarana = get4avarana,
 }
