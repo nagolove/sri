@@ -219,6 +219,12 @@ function construct(cx, cy, baseLineParam, circleRad)
     local dir
 
     -- 250 - конец отрезка должен выходить за окружность
+    print("p5", inspect(p5))
+    print("p7", inspect(p7))
+    if not p5 or not p7 then
+        return {}
+    end
+
     dir = (p7 - p5):normalizeInplace() * circleRad
     local line7 = copy({p5, p7 + dir})
 

@@ -36,6 +36,8 @@ function love.draw()
         lg.draw(canvas)
     end
 
+    lg.draw(touchCanvas)
+
     --linesbuf:pushi("baseLineParam = %d", baseLineParam)
     linesbuf:draw()
 end
@@ -46,8 +48,6 @@ function drawAvarana(num)
             drawSri2Canvas()
         end
         local funcName = "get" .. num .. "avarana"
-        --print(funcName)
-        --print("lines", inspect(lines))
         local triangles = sri[funcName](lines)
         lg.setCanvas(canvas)
         lg.setColor{0.8, 0, 0}
@@ -61,11 +61,9 @@ end
 function drawSri2Canvas()
     local cx, cy = w / 2, h / 2
     local circleRad = 0.4 * h
-    --lines = sri.construct(cx, cy, baseLineParam * h, circleRad)
-    --print("param", baseLineParam * h)
+
     lines = construct(cx, cy, baseLineParam, circleRad)
-    --print("cx, cy", cx, cy)
-    --print("line", inspect(lines))
+
     lg.setCanvas(canvas)
     lg.clear()
 
@@ -74,7 +72,6 @@ function drawSri2Canvas()
     lg.setColor{1, 0, 0}
     for _, v in pairs(lines) do
         for _, l in pairs(v) do
-            --print("line", inspect(v))
             lg.line(l[1].x, l[1].y, l[2].x, l[2].y)
         end
     end
@@ -83,7 +80,6 @@ function drawSri2Canvas()
     lg.circle("fill", cx, cy, 3)
 
     lg.setColor{1, 1, 1}
-    -- нужно вычислить подходящий радиус окружности автоматически
     lg.circle("line", cx, cy, circleRad)
 
     lg.setCanvas()
@@ -113,33 +109,49 @@ function resize(neww, newh)
 end
 
 if love.system.getOS() ~= "Android" then
-    love.touchmoved = function(x, y, dx, dy)
 
-    end
-end
-
-function love.keypressed(_, key)
-    -- переключение режимов экрана
-    if love.system.getOS() ~= "Android" then
-        if love.keyboard.isDown("ralt", "lalt") and key == "return" then
-            -- код дерьмовый, но работает
-            if screenMode == "fs" then
-                love.window.setMode(800, 600, {fullscreen = false})
-                screenMode = "win"
-                resize(love.graphics.getDimensions())
-            else
-                love.window.setMode(0, 0, {fullscreen = true,
-                fullscreentype = "exclusive"})
-                screenMode = "fs"
-                resize(love.graphics.getDimensions())
+    function love.keypressed(_, key)
+        -- переключение режимов экрана
+        if love.system.getOS() ~= "Android" then
+            if love.keyboard.isDown("ralt", "lalt") and key == "return" then
+                -- код дерьмовый, но работает
+                if screenMode == "fs" then
+                    love.window.setMode(800, 600, {fullscreen = false})
+                    screenMode = "win"
+                    resize(love.graphics.getDimensions())
+                else
+                    love.window.setMode(0, 0, {fullscreen = true,
+                    fullscreentype = "exclusive"})
+                    screenMode = "fs"
+                    resize(love.graphics.getDimensions())
+                end
             end
         end
+        if key == "escape" then
+            love.event.quit()
+        elseif key == "4" then
+            drawAvarana(4)
+        elseif key == "5" then
+            drawAvarana(5)
+        end
     end
-    if key == "escape" then
-        love.event.quit()
-    elseif key == "4" then
-        drawAvarana(4)
-    elseif key == "5" then
-        drawAvarana(5)
+
+end
+
+if love.system.getOS() == "Android" then
+    function drawTouchPresses(x, y)
+        lg.setCanvas(touchCanvas)
+        lg.setColor{0.5, 0.5, 0.5}
+        lg.circle("fill", x, y, 5)
+        lg.setCanvas()
+    end
+
+    love.touchmoved = function(x, y, dx, dy)
+        dy = dy / 10
+        print("dx", dx)
+        baseLineParam = baseLineParam + dy
+        drawSri2Canvas()
+        drawTouchPresses(x, y)
     end
 end
+
