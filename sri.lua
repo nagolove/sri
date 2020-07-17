@@ -1,5 +1,3 @@
-__DEBUG__ = true
-
 local vector = require "vector"
 local isvector = vector.isvector
 local inspect = require "inspect"
@@ -184,13 +182,9 @@ function construct(cx, cy, baseLineParam, circleRad)
     local __stageShot = stageShot
     stageShot = function() end
 
-    --local cx, cy = w / 2, h / 2
     baseLineParam = math.ceil(baseLineParam)
-    print("construct", cx, cy, baseLineParam, circleRad)
-    local line_tri1_top, line_tri2_bottom = getBaseLines(cx, cy, baseLineParam, circleRad)
 
-    --lg.setColor{0, 0, 0}
-    --lg.circle("line", cx, cy, circleRad)
+    local line_tri1_top, line_tri2_bottom = getBaseLines(cx, cy, baseLineParam, circleRad)
 
     stageShot(line_tri1_top)
     stageShot(line_tri2_bottom)
@@ -215,9 +209,6 @@ function construct(cx, cy, baseLineParam, circleRad)
     stageShot(line_tri1_right)
     stageShot(line_tri2_left)
     stageShot(line_tri2_right)
-
-    --local rline1, rline2, rline3, rline4, rline5, rline6 = copy(line_tri1_top), copy(line2),
-        --copy(line_tri1_left), copy(line_tri1_right), copy(line_tri2_left), copy(line_tri2_right)
 
     local p5 = intersection(line_tri1_top[1], line_tri1_top[2], line_tri2_right[1], line_tri2_right[2])
     local p6 = intersection(line_tri1_top[1], line_tri1_top[2], line_tri2_left[1], line_tri2_left[2])

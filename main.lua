@@ -3,11 +3,15 @@
 -- Общие параметры - диаметр вписанной в квадрат защиты окружности, 
 -- ширина квадрата защиты
 -- ]]
+require "defines"
 local inspect = require "inspect"
 local linesbuf = require "kons".new()
 local bhupur = require "bhupur"
 local lg = love.graphics
+
 local canvas = lg.newCanvas()
+local touchCanvas = lg.newCanvas()
+
 local visible = true
 local sri = require "sri"
 local tween = require "tween"
@@ -19,11 +23,10 @@ local w, h = lg.getDimensions()
 local cx, cy
 local baseLineParam = 0.1
 local circleRad
-local vertLine
 
 function love.load()
     resize(w, h)
-    drawAvarana(5)
+    --drawAvarana(5)
 end
 
 function love.draw()
@@ -43,7 +46,8 @@ function drawAvarana(num)
             drawSri2Canvas()
         end
         local funcName = "get" .. num .. "avarana"
-        print(funcName)
+        --print(funcName)
+        --print("lines", inspect(lines))
         local triangles = sri[funcName](lines)
         lg.setCanvas(canvas)
         lg.setColor{0.8, 0, 0}
@@ -57,10 +61,10 @@ end
 function drawSri2Canvas()
     local cx, cy = w / 2, h / 2
     local circleRad = 0.4 * h
-    lines = sri.construct(cx, cy, baseLineParam * h, circleRad)
+    --lines = sri.construct(cx, cy, baseLineParam * h, circleRad)
     --print("param", baseLineParam * h)
-    --local lines = construct(cx, cy, baseLineParam, circleRad)
-    print("cx, cy", cx, cy)
+    lines = construct(cx, cy, baseLineParam, circleRad)
+    --print("cx, cy", cx, cy)
     --print("line", inspect(lines))
     lg.setCanvas(canvas)
     lg.clear()
@@ -92,9 +96,13 @@ function love.update(dt)
     if kb.isDown("up") then
         baseLineParam = baseLineParam + 0.1
         drawSri2Canvas()
+        drawAvarana(4)
+        drawAvarana(5)
     elseif kb.isDown("down") then
         baseLineParam = baseLineParam - 0.1
         drawSri2Canvas()
+        drawAvarana(4)
+        drawAvarana(5)
     end
 end
 
@@ -104,19 +112,27 @@ function resize(neww, newh)
     drawSri2Canvas()
 end
 
+if love.system.getOS() ~= "Android" then
+    love.touchmoved = function(x, y, dx, dy)
+
+    end
+end
+
 function love.keypressed(_, key)
     -- переключение режимов экрана
-    if love.keyboard.isDown("ralt", "lalt") and key == "return" then
-        -- код дерьмовый, но работает
-        if screenMode == "fs" then
-            love.window.setMode(800, 600, {fullscreen = false})
-            screenMode = "win"
-            resize(love.graphics.getDimensions())
-        else
-            love.window.setMode(0, 0, {fullscreen = true,
-                                       fullscreentype = "exclusive"})
-            screenMode = "fs"
-            resize(love.graphics.getDimensions())
+    if love.system.getOS() ~= "Android" then
+        if love.keyboard.isDown("ralt", "lalt") and key == "return" then
+            -- код дерьмовый, но работает
+            if screenMode == "fs" then
+                love.window.setMode(800, 600, {fullscreen = false})
+                screenMode = "win"
+                resize(love.graphics.getDimensions())
+            else
+                love.window.setMode(0, 0, {fullscreen = true,
+                fullscreentype = "exclusive"})
+                screenMode = "fs"
+                resize(love.graphics.getDimensions())
+            end
         end
     end
     if key == "escape" then
