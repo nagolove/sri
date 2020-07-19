@@ -24,6 +24,8 @@ local cx, cy
 local baseLineParam = 0.1
 local circleRad
 
+local ratio = 1 / 100
+
 function love.load()
     resize(w, h)
     --drawAvarana(5)
@@ -38,7 +40,11 @@ function love.draw()
 
     lg.draw(touchCanvas)
 
-    --linesbuf:pushi("baseLineParam = %d", baseLineParam)
+    linesbuf:pushi("baseLineParam = %d", baseLineParam)
+    if baseLine then
+        linesbuf:pushi("baseLine = %d", baseLine)
+    end
+    --linesbuf:pushi("baseLineRatio = %d", baseLineRatio)
     linesbuf:draw()
 end
 
@@ -62,7 +68,10 @@ function drawSri2Canvas()
     local cx, cy = w / 2, h / 2
     local circleRad = 0.4 * h
 
-    lines = construct(cx, cy, baseLineParam, circleRad)
+    --baseLineRatio = h / baseLineParam
+    baseLine = h / baseLineParam * ratio
+    print(baseLine)
+    lines = construct(cx, cy, baseLine, circleRad)
 
     lg.setCanvas(canvas)
     lg.clear()
@@ -90,12 +99,12 @@ function love.update(dt)
     linesbuf:update(dt)
     local kb = love.keyboard
     if kb.isDown("up") then
-        baseLineParam = baseLineParam + 0.1
+        baseLineParam = baseLineParam + 0.1 * dt
         drawSri2Canvas()
         drawAvarana(4)
         drawAvarana(5)
     elseif kb.isDown("down") then
-        baseLineParam = baseLineParam - 0.1
+        baseLineParam = baseLineParam - 0.1 * dt
         drawSri2Canvas()
         drawAvarana(4)
         drawAvarana(5)
@@ -106,6 +115,8 @@ function resize(neww, newh)
     w, h = neww, newh
     canvas = lg.newCanvas(w, h)
     drawSri2Canvas()
+    drawAvarana(4)
+    drawAvarana(5)
 end
 
 if love.system.getOS() ~= "Android" then
@@ -129,10 +140,6 @@ if love.system.getOS() ~= "Android" then
         end
         if key == "escape" then
             love.event.quit()
-        elseif key == "4" then
-            drawAvarana(4)
-        elseif key == "5" then
-            drawAvarana(5)
         end
     end
 
@@ -146,11 +153,15 @@ if love.system.getOS() == "Android" then
         lg.setCanvas()
     end
 
-    love.touchmoved = function(x, y, dx, dy)
+    love.touchmoved = function(id, x, y, dx, dy)
         dy = dy / 10
-        print("dx", dx)
-        baseLineParam = baseLineParam + dy
+        --print("dy", dy)
+        local h = lg.getHeight()
+        if baseLineParam + dy > 0 and baseLineParam + dy < h / 2 then
+            baseLineParam = baseLineParam + dy
+        end
         drawSri2Canvas()
+        print(type(x), type(y))
         drawTouchPresses(x, y)
     end
 end

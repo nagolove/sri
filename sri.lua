@@ -197,7 +197,13 @@ function construct(cx, cy, baseLineParam, circleRad)
 
     stageShot(vertLine)
 
+    if not line_tri1_top[2] then
+        return {}
+    end
     local p1, p2 = intersectionWithCircle(line_tri1_top[1], line_tri1_top[2], vector(cx, cy), circleRad)
+    if not line_tri1_top[2] then
+        return {}
+    end
     local p3, p4 = intersectionWithCircle(line_tri2_bottom[1], line_tri2_bottom[2], vector(cx, cy), circleRad)
 
     local line_tri1_left = copy{p1, vector(cx, cy + circleRad)}
@@ -219,8 +225,8 @@ function construct(cx, cy, baseLineParam, circleRad)
     local dir
 
     -- 250 - конец отрезка должен выходить за окружность
-    print("p5", inspect(p5))
-    print("p7", inspect(p7))
+    --print("p5", p5)
+    --print("p7", p7)
     if not p5 or not p7 then
         return {}
     end
