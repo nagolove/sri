@@ -92,11 +92,12 @@ function drawSri2Canvas()
     lg.clear{0.5, 0.5, 0.5}
 
     lg.setColor{1, 1, 1}
-    bhupur.draw(w / 2, h / 2, h)
-    lg.setColor{1, 0, 0}
-    bhupur.draw(w / 2, h / 2, h - 4)
-    lg.setColor{0, 0, 0}
-    bhupur.draw(w / 2, h / 2, h - 8)
+    bhupur.draw(w / 2, h / 2, h - 10)
+
+    --lg.setColor{1, 0, 0}
+    --bhupur.draw(w / 2, h / 2, h - 4)
+    --lg.setColor{0, 0, 0}
+    --bhupur.draw(w / 2, h / 2, h - 8)
 
     lg.setColor{1, 0, 0}
     for _, v in pairs(lines) do
@@ -112,7 +113,9 @@ function drawSri2Canvas()
     lg.circle("line", cx, cy, circleRad)
 
     lg.setCanvas()
+
     --canvas:newImageData():encode("png", "canva.png")
+    
 end
 
 local lastdt
