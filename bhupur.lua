@@ -47,8 +47,8 @@ function bhupur.draw(x, y, w)
         x + w, y,
     }
     local old = pack(lg.getColor())
-    lg.setColor(bhupur.color)
-    lg.setLineWidth(2)
+    --lg.setColor(bhupur.color)
+    --lg.setLineWidth(1)
 
     lg.line(points)
 

@@ -8,6 +8,7 @@ local inspect = require "inspect"
 local linesbuf = require "kons".new()
 local bhupur = require "bhupur"
 local lg = love.graphics
+local lume = require "lume"
 
 local canvas = lg.newCanvas()
 local touchCanvas = lg.newCanvas()
@@ -27,15 +28,29 @@ local circleRad
 local ratio = 1 / 100
 
 function love.load()
-    resize(w, h)
+    love.window.setMode(0, 0, {fullscreen = true})
+    resize(lg.getDimensions())
     --drawAvarana(5)
 end
 
 function love.draw()
+    if love.system.getOS() == "Android" then
+        lg.push()
+        local w, h = lg.getDimensions()
+        lg.translate(w / 2, h / 2)
+        lg.rotate(-math.pi / 2)
+        --lg.scale(0.5)
+        lg.translate(-w / 2, -h / 2)
+    end
 
+    lg.clear{0.5, 0.5, 0.5}
     if visible then
         lg.setColor{1, 1, 1, 1}
         lg.draw(canvas)
+    end
+
+    if love.system.getOS() == "Android" then
+        lg.pop()
     end
 
     lg.draw(touchCanvas)
@@ -74,9 +89,14 @@ function drawSri2Canvas()
     lines = construct(cx, cy, baseLine, circleRad)
 
     lg.setCanvas(canvas)
-    lg.clear()
+    lg.clear{0.5, 0.5, 0.5}
 
+    lg.setColor{1, 1, 1}
     bhupur.draw(w / 2, h / 2, h)
+    lg.setColor{1, 0, 0}
+    bhupur.draw(w / 2, h / 2, h - 4)
+    lg.setColor{0, 0, 0}
+    bhupur.draw(w / 2, h / 2, h - 8)
 
     lg.setColor{1, 0, 0}
     for _, v in pairs(lines) do
@@ -95,6 +115,8 @@ function drawSri2Canvas()
     --canvas:newImageData():encode("png", "canva.png")
 end
 
+local lastdt
+
 function love.update(dt)
     linesbuf:update(dt)
     local kb = love.keyboard
@@ -109,6 +131,7 @@ function love.update(dt)
         drawAvarana(4)
         drawAvarana(5)
     end
+    lastdt = dt
 end
 
 function resize(neww, newh)
@@ -154,14 +177,20 @@ if love.system.getOS() == "Android" then
     end
 
     love.touchmoved = function(id, x, y, dx, dy)
-        dy = dy / 10
-        --print("dy", dy)
+        print("dx, dy", dx, dy)
         local h = lg.getHeight()
+        dx = dx / 20
         if baseLineParam + dy > 0 and baseLineParam + dy < h / 2 then
-            baseLineParam = baseLineParam + dy
+            --baseLineParam = baseLineParam - 0.1 * dt
+            baseLineParam = baseLineParam + dx
+            print("baseLineParam", baseLineParam)
+            baseLineParam = lume.clamp(baseLineParam, 20, h / 4)
+            print("clamped baseLineParam", baseLineParam)
         end
         drawSri2Canvas()
-        print(type(x), type(y))
+        drawAvarana(4)
+        drawAvarana(5)
+        --print(type(x), type(y))
         drawTouchPresses(x, y)
     end
 end
