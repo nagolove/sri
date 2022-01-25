@@ -22,11 +22,11 @@ local bhupur = {
 --end
 
 -- расчет ширины картинки по ширине квадрата
-function bhupur.getWidth(w)
+function bhupur.getWidth(w: number): number
     return (w - bhupur.neck * w) / 2
 end
 
-function scalePoints(points)
+function scalePoints(points: {number})
     points[1] = points[1] + 1
     points[2] = points[2] + 1
 
@@ -58,7 +58,9 @@ function scalePoints(points)
     points[20] = points[20] + 1
 end
 
-function drawParts(points, xcenter, ycenter, w, y)
+function drawParts(points: {number}, 
+    xcenter: number, _: number, w: number, y: number
+)
     lg.line(points)
 
     lg.translate(xcenter, y)
@@ -80,7 +82,7 @@ function drawParts(points, xcenter, ycenter, w, y)
     lg.origin()
 end
 
-function bhupur.draw(x, y, w)
+function bhupur.draw(x: number, y: number, w: number)
     local height = bhupur.height
     w = w - height * 2
     x = x - w / 2
@@ -120,7 +122,7 @@ function bhupur.draw(x, y, w)
     scalePoints(points3)
     scalePoints(points3)
 
-    local old = pack(lg.getColor())
+    local old = {lg.getColor()}
 
     local xcenter = x + w / 2
     local ycenter = y + w / 2

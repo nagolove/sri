@@ -8,22 +8,26 @@
 local linesbuf = require "kons".new()
 local bhupur = require "bhupur"
 local lg = love.graphics
-local lume = require "lume"
+--local lume = require "lume"
 
 local canvas = lg.newCanvas()
 local touchCanvas = lg.newCanvas()
 
+local require_path = "scenes/t80/?.lua;?.lua;?/init.lua;"
+print('require_path', require_path)
+love.filesystem.setRequirePath(require_path)
+
 local visible = true
 local sri = require "sri"
-local tween = require "tween"
+--local tween = require "tween"
 local lines
 
 local w, h = lg.getDimensions()
 
 -- центр построения
-local cx, cy
+--local cx, cy: number, number
 local baseLineParam = 0.1
-local circleRad
+local circleRad: number
 
 local ratio = 1 / 100
 
@@ -63,7 +67,7 @@ function love.draw()
     linesbuf:draw()
 end
 
-function drawAvarana(num)
+function drawAvarana(num: number)
     if num == 4 or num == 5 then
         if not lines then
             drawSri2Canvas()
@@ -79,6 +83,10 @@ function drawAvarana(num)
     end
 end
 
+require 'pipeline'
+local event_channel = love.thread.getChannel("event_channel")
+local pipeline = Pipeline.new()
+
 function drawSri2Canvas()
     local cx, cy = w / 2, h / 2
     local circleRad = 0.4 * h
@@ -86,7 +94,7 @@ function drawSri2Canvas()
     --baseLineRatio = h / baseLineParam
     baseLine = h / baseLineParam * ratio
     print(baseLine)
-    lines = construct(cx, cy, baseLine, circleRad)
+    lines = sri.construct(cx, cy, baseLine, circleRad)
 
     lg.setCanvas(canvas)
     lg.clear{0.5, 0.5, 0.5}
@@ -137,7 +145,7 @@ function love.update(dt)
     lastdt = dt
 end
 
-function resize(neww, newh)
+function resize(neww: number, newh: number)
     w, h = neww, newh
     canvas = lg.newCanvas(w, h)
     drawSri2Canvas()
@@ -145,32 +153,86 @@ function resize(neww, newh)
     drawAvarana(5)
 end
 
-if love.system.getOS() ~= "Android" then
-
-    function love.keypressed(_, key)
-        -- переключение режимов экрана
-        if love.system.getOS() ~= "Android" then
-            if love.keyboard.isDown("ralt", "lalt") and key == "return" then
-                -- код дерьмовый, но работает
-                if screenMode == "fs" then
-                    love.window.setMode(800, 600, {fullscreen = false})
-                    screenMode = "win"
-                    resize(love.graphics.getDimensions())
-                else
-                    love.window.setMode(0, 0, {fullscreen = true,
-                    fullscreentype = "exclusive"})
-                    screenMode = "fs"
-                    resize(love.graphics.getDimensions())
+local function mainloop()
+    local events = event_channel:pop() as {any}
+    if events then
+        for _, e in ipairs(events) do
+            local evtype: string = (e as {string})[1]
+            if evtype == "mousemoved" then
+                mx = math.floor((e as {number})[2])
+                my = math.floor((e as {number})[3])
+            elseif evtype == "keypressed" then
+                local key = (e as {string})[2]
+                local scancode = (e as {string})[3]
+                print('keypressed', key, scancode)
+                if scancode == "escape" then
+                    love.event.quit()
                 end
+            elseif evtype == "mousepressed" then
+                --local x: number = (e as {number})[2]
+                --local y: number = (e as {number})[3]
+                --local button: number = (e as {number})[4]
+                --local istouch: boolean = (e as {boolean})[5]
+                --local presses: number = (e as {number})[6]
             end
-        end
-        if key == "escape" then
-            love.event.quit()
         end
     end
 
-end
+    local nt = love.timer.getTime()
+    local pause = 1. / 300.
+    if nt - last_render >= pause then
+        last_render = nt
 
+        pipeline:openAndClose('clear')
+
+        pipeline:open('text')
+        pipeline:close()
+
+        local x, y = love.mouse.getPosition()
+        local rad = 50
+        pipeline:open('circle_under_mouse')
+        pipeline:push(y)
+        pipeline:push(x)
+        pipeline:push(rad)
+        pipeline:close()
+
+        pipeline:sync()
+    end
+end
+--]]
+
+--render()
+--[[
+function love.keypressed(_, key)
+    -- переключение режимов экрана
+    if love.system.getOS() ~= "Android" then
+        if love.keyboard.isDown("ralt", "lalt") and key == "return" then
+            -- код дерьмовый, но работает
+            if screenMode == "fs" then
+                love.window.setMode(800, 600, {fullscreen = false})
+                screenMode = "win"
+                resize(love.graphics.getDimensions())
+            else
+                love.window.setMode(0, 0, {fullscreen = true,
+                fullscreentype = "exclusive"})
+                screenMode = "fs"
+                resize(love.graphics.getDimensions())
+            end
+        end
+    end
+    if key == "escape" then
+        love.event.quit()
+    end
+end
+--]]
+
+mainloop()
+
+--function clamp(x: number, min: number, max: number): number
+  --return x < min and min or (x > max and max or x)
+--end
+
+--[[
 if love.system.getOS() == "Android" then
     function drawTouchPresses(x, y)
         lg.setCanvas(touchCanvas)
@@ -187,7 +249,7 @@ if love.system.getOS() == "Android" then
             --baseLineParam = baseLineParam - 0.1 * dt
             baseLineParam = baseLineParam + dx
             print("baseLineParam", baseLineParam)
-            baseLineParam = lume.clamp(baseLineParam, 20, h / 4)
+            baseLineParam = clamp(baseLineParam, 20, h / 4)
             print("clamped baseLineParam", baseLineParam)
         end
         drawSri2Canvas()
@@ -197,5 +259,4 @@ if love.system.getOS() == "Android" then
         drawTouchPresses(x, y)
     end
 end
-
-
+--]]
