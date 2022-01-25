@@ -1,15 +1,19 @@
+-- vim: set colorcolumn=85
+-- vim: set foldmethod=marker
+
 -- [[
--- vim: set foldmethod=manual
 -- Общие параметры - диаметр вписанной в квадрат защиты окружности, 
 -- ширина квадрата защиты
 -- ]]
+
 --require "defines"
 --local inspect = require "inspect"
-local linesbuf = require "kons".new()
+--local linesbuf = require "kons".new()
 local bhupur = require "bhupur"
 local lg = love.graphics
 --local lume = require "lume"
 
+--[[
 local canvas = lg.newCanvas()
 local touchCanvas = lg.newCanvas()
 
@@ -226,7 +230,7 @@ function love.keypressed(_, key)
 end
 --]]
 
-mainloop()
+--mainloop()
 
 --function clamp(x: number, min: number, max: number): number
   --return x < min and min or (x > max and max or x)
@@ -260,3 +264,4 @@ if love.system.getOS() == "Android" then
     end
 end
 --]]
+
